@@ -78,7 +78,7 @@ module ActiveModule
           possible_module_names(module_instance).map do |name|
             [name.to_sym, module_instance]
           end
-        end.to_h
+        end.to_h.freeze
     end
 
     def possible_module_names(module_instance)
