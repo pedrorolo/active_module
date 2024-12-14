@@ -350,7 +350,7 @@ module PipelineStage
     extend Base
   end
 
-  def PaidOut
+  module PaidOut
     extend Base
   end
 
