@@ -84,7 +84,7 @@ RSpec.describe ActiveModule::Base do
     active_record_class.create!(strategy: "MyClass::MoreNesting")
     expect(Nested::MyClass::MoreNesting)
       .to(
-        eq active_record_class.find_by(strategy: "Nested::MyClass::MoreNesting")
+        eq active_record_class.find_by(strategy: "MyClass::MoreNesting")
                               .strategy
       )
   end
