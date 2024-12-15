@@ -136,4 +136,15 @@ RSpec.describe ActiveModule::Base do
       active_record_class.where(strategy: "WrongStringThatIsNotAModule").load
     end.to raise_error(ActiveModule::InvalidModuleValue)
   end
+
+  it "mass assignment works" do
+    object = active_record_class.new(strategy: :MoreNesting)
+    expect(object.strategy).to eq Nested::MyClass::MoreNesting
+  end
+
+  it "assignment works" do
+    object = active_record_class.new
+    object.strategy = :MoreNesting
+    expect(object.strategy).to eq Nested::MyClass::MoreNesting
+  end
 end
