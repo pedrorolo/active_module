@@ -46,7 +46,7 @@ utilizations, for instance:
 - Assigning a field with one Configuration from a list of static configurations
 - Rich Java/C#-like enums
 
-We provide examples for these usages in [Usage -> Examples :](###Examples) 
+We provide examples for these usages in [Usage -> Examples :](#Examples) 
 
 
 ## Usage
