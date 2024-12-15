@@ -89,6 +89,16 @@ RSpec.describe ActiveModule::Base do
       )
   end
 
+  it "is possible to assign and query "\
+  "using nested suffixes of the full module names" do
+    active_record_class.create!(strategy: "MoreNesting")
+    expect(Nested::MyClass::MoreNesting)
+      .to(
+        eq active_record_class.find_by(strategy: "MoreNesting")
+                              .strategy
+      )
+  end
+
   it "when creating with a module that is not in the "\
       "list of possible modules we get failures" do
     expect { active_record_class.create!(strategy: RandomModule) }
