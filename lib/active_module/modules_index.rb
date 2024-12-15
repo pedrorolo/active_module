@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Indexes modules by symbols of their qualified and unqualified names.
 module ActiveModule
   class ModulesIndex
@@ -13,6 +15,8 @@ module ActiveModule
       possible_sym_module_index.keys
     end
 
+    private
+
     def possible_sym_module_index
       @possible_sym_module_index ||=
         @possible_modules.flat_map do |module_instance|
@@ -24,14 +28,17 @@ module ActiveModule
 
     def possible_module_names(module_instance)
       name_parts = module_instance.name.split("::")
-      qualified_name = "::#{module_instance.name}"
-      [qualified_name].tap do |possible_names|
+      [qualified_name(module_instance)].tap do |possible_names|
         loop do
           possible_names << name_parts.join("::").freeze
           name_parts = name_parts.drop(1)
           break if name_parts.empty?
         end
       end
+    end
+
+    def qualified_name(module_instance)
+      "::#{module_instance.name}"
     end
   end
 end
