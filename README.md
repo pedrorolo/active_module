@@ -7,6 +7,38 @@ It allows storing a reference to a `Module` or `Class` in a `:string` database f
 It automatically casts strings and symbols into modules for the purposes of object creation 
 and querying.
 
+## Installation
+
+<!-- TODO: Replace `UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG` with your gem name right after releasing it to RubyGems.org. Please do not do it earlier due to security reasons. Alternatively, replace this section with instructions to install your gem from git if you don't plan to release to RubyGems.org.
+
+Install the gem and add to the application's Gemfile by executing:
+
+    $ bundle add UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG
+
+If bundler is not being used to manage dependencies, install the gem by executing:
+
+    $ gem install UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG -->
+
+Add to your gemfile:
+
+```ruby
+gem 'active_module', "~>0.0.1"
+```
+
+Add to a rails initializer, such as `intializers/types.rb`
+
+```ruby
+ActiveModule.register!
+```
+
+or
+
+```ruby
+ActiveModel::Type.register(:active_module, ActiveModule::Base)
+ActiveRecord::Type.register(:active_module, ActiveModule::Base)
+```
+
+
 ## Usage
 
 ```ruby
@@ -199,22 +231,6 @@ object.pipeline_stage&.frontend_representation #=> INITIAL_STAGE
 object.pipeline_stage = :InNegotiations
 object.pipeline_stage&.database_representation #=> "PipelineStage::InNegotiations"
 ```
-
-## Installation
-
-TODO: Replace `UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG` with your gem name right after releasing it to RubyGems.org. Please do not do it earlier due to security reasons. Alternatively, replace this section with instructions to install your gem from git if you don't plan to release to RubyGems.org.
-
-Install the gem and add to the application's Gemfile by executing:
-
-    $ bundle add UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG
-
-If bundler is not being used to manage dependencies, install the gem by executing:
-
-    $ gem install UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG
-
-## Usage
-
-TODO: Write usage instructions here
 
 ## Development
 
