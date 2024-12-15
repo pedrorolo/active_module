@@ -7,6 +7,17 @@ It allows storing a reference to a `Module` or `Class` in a `:string` database f
 It automatically casts strings and symbols into modules for the purposes of object creation 
 and querying.
 
+## Index
+
+- (Index)[#index]
+- (Installation)[#installation]
+- (Usage)[#usage]
+  * (Examples)[#examples]
+    - (Strategy Design Pattern)[#strategy-design-pattern]
+    - (Rapid Prototying static domain objects without persistence)[#rapid-prototying-static-domain-objects-without-persistence]
+    - (Assigning a field with one Configuration from a list of static configurations)[assigning-a-field-with-one-configuration-from-a-list-of-static-configurations]
+    - (Rich Java/C#-like enums)[#rich-javac-like-enums]
+
 ## Installation
 
 <!-- TODO: Replace `UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG` with your gem name right after releasing it to RubyGems.org. Please do not do it earlier due to security reasons. Alternatively, replace this section with instructions to install your gem from git if you don't plan to release to RubyGems.org.
