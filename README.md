@@ -106,6 +106,9 @@ MyARObject.where(module_field: "MyClass::MyModule1") #=> object4
 
 #### Strategy design pattern
 
+[The Strategy design pattern](https://en.wikipedia.org/wiki/Strategy_pattern) allows composition based polymorphism. This enables runtime polymorphism (by changing the strategy in runtime), 
+and multiple-polymorphism (by composing an object of multiple strategies).
+
 ```ruby
 class MyARObject < ActiveRecord::Base
   module Strategy1
@@ -197,6 +200,7 @@ MyARObject.create!(module_field: Provider::Amazon).provider.do_something!
 What is interesting about this is that we can later easily promote
 our provider objects into full fledged Active::Record objects without 
 minor changes to our code:
+
 ```ruby 
 # Provider domain Object
 module ProviderConfig
@@ -241,8 +245,8 @@ class MyARObject < ActiveRecord::Base
   end
 end
 
-MyARObject.create!(provider: :Ebay).load_page!
-
+MyARObject.create!(provider_config: :Ebay).load_page!
+```
 
 #### Rich Java/C#-like enums
 This example is more to show the possibility. 
