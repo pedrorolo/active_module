@@ -148,19 +148,23 @@ minor changes to our code:
 # Provider domain Object
 module Provider
   extend self
+
   def all
     [Ebay, Amazon]
   end
 
-  module Base
+  # As if the domain model class
+  module Base 
     def do_something!
       "do something with #{something_from_an_instance}"
     end
   end
 
+  # As if the domain model instances
   module Ebay
     include Base
     extend self
+
     def something_from_an_instance
       "the ebay provider config"
     end
@@ -169,6 +173,7 @@ module Provider
   module Amazon
     include Base
     extend self
+
     def something_from_an_instance
       "the amazon provider config"
     end
@@ -183,11 +188,60 @@ end
 
 MyARObject.create!(provider: :Ebay).provier.do_something! 
   #=> "do something with the ebay provider config"
-MyARObject.create!(module_field: :Amazon).provider.do_something! 
+MyARObject.create!(module_field: Provider::Amazon).provider.do_something! 
   #=> "do something with the amazon provider config"
 ```
 
 #### Assigning a field with one Configuration from a list of static configurations
+
+What is interesting about this is that we can later easily promote
+our provider objects into full fledged Active::Record objects without 
+minor changes to our code:
+```ruby 
+# Provider domain Object
+module ProviderConfig
+  extend self
+
+  def all
+    [Ebay, Amazon]
+  end
+
+  module Ebay
+    module_function
+
+    def url= 'www.ebay.com'
+    def number_of_attempts= 5 
+  end
+
+  module Amazon
+    module_function
+
+    def url= 'www.amazon.com'
+    def number_of_attempts= 10
+  end
+end
+
+class MyARObject < ActiveRecord::Base
+  attribute :provider_config, 
+            :active_module, 
+            possible_modules: Provider.all
+
+  def load_page!
+    n_attempts = 0
+    result = nil
+    while n_attempts < provider.number_of_attempts
+      result = get_page(provider.url)
+      if(result)
+        return result
+      else
+        n_attempts.inc
+      end
+    end
+    result
+  end
+end
+
+MyARObject.create!(provider: :Ebay).load_page!
 
 
 #### Rich Java/C#-like enums

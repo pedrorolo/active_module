@@ -5,7 +5,7 @@ module ActiveModule
     def initialize(value, possible_modules)
       super(<<~ERROR_MESSAGE)
         "Invalid module value #{value.inspect}:#{" "}
-         It must be one of:#{" "}
+         It must be one of:
           #{possible_modules.inspect}
          or one of their demodulized names:
           #{possible_modules.map(&:name).map(&:demodulize).inspect}"

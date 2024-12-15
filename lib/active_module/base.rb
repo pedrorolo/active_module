@@ -5,7 +5,7 @@ require "active_model"
 module ActiveModule
   class Base < ActiveModel::Type::Value
     def initialize(possible_modules:)
-      @possible_modules = possible_modules
+      @possible_modules = possible_modules.freeze
       super()
     end
 
@@ -61,23 +61,11 @@ module ActiveModule
     end
 
     def possible_modules_set
-      @possible_modules_set ||= Set.new(@possible_modules)
-    end
-
-    def possible_str?(str)
-      @possible_strings.include?(str)
+      @possible_modules_set ||= Set.new(@possible_modules).freeze
     end
 
     def possible_module?(module_instance)
       possible_modules_set.include?(module_instance)
-    end
-
-    def possible_strings
-      @possible_strings ||= possible_str_module_names_index.keys
-    end
-
-    def possible_full_module_names
-      Set.new(@possible_modules.map { |m| globalize(m.name).freeze })
     end
 
     def possible_str_module_names_index
@@ -86,7 +74,7 @@ module ActiveModule
           possible_module_names(module_instance).map do |name|
             [name.freeze, module_instance]
           end
-        end.to_h
+        end.to_h.freeze
     end
 
     def possible_module_names(module_instance)
