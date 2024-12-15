@@ -38,6 +38,16 @@ ActiveModel::Type.register(:active_module, ActiveModule::Base)
 ActiveRecord::Type.register(:active_module, ActiveModule::Base)
 ```
 
+The original idea behind this functionality was to enable idiomatic and duck typed implementations
+of the strategy design pattern. However, this is a very generic mechanism that enables many possible 
+utilizations, for instance:
+- Strategy Pattern: Composition based polymorphism
+- Rapid prototyping static domain objects without persisting them
+- Assigning a field with one Configuration from a list of static configurations
+- Rich Java/C#-like enums
+
+We provide examples for these usages in [Usage -> Examples :](###Examples) 
+
 
 ## Usage
 
@@ -50,12 +60,17 @@ end
 class MyARObject < ActiveRecord::Base
   module MyModule1; end
   module MyModule2; end
-  class MyClass; end
+  class MyClass; 
+    module Module1; end
+  end
 
 
   attribute :module_field, 
             :active_module, 
-            possible_modules: [MyModule1, MyModule2, MyClass]
+            possible_modules: [MyModule1, 
+                              MyModule2, 
+                              MyClass, 
+                              MyClass::VeryNested]
 end
 
 object1 = MyARObject.create!(module_field: MyARObject::MyModule1)
@@ -67,21 +82,16 @@ object2.module_field #=> MyARObject::MyModule2:Module
 object3 = MyARObject.create!(module_field: :MyClass)
 object3.module_field #=> MyARObject::MyClass:Module
 
+object4 = MyARObject.create!(module_field: 'MyClass::Module1')
+
 
 MyARObject.where(module_field: MyARObject::MyClass) #=> object3
-MyARObject.where(module_field: "MyModule1") #=> object1
+MyARObject.where(module_field: "MyARObject::MyModule1") #=> object1
 MyARObject.where(module_field: :MyModule2) #=> object2
+MyARObject.where(module_field: "MyClass::MyModule1") #=> object4
 ```
 
-### Motivation
-
-The original idea behind this functionality was to enable idiomatic and duck typed implementations
-of the strategy design pattern. However, this is a very generic mechanism that enables many possible 
-utilizations, for instance:
-- Strategy Pattern: Composition based polymorphism
-- Rapid prototyping static domain objects without persisting them
-- Rich Java/C#-like enums
-- Assigning a field with one Configuration from a list of static configurations
+### Examples
 
 #### Strategy design pattern
 
@@ -165,6 +175,8 @@ MyARObject.create!(provider: :Ebay).provier.do_something!
 MyARObject.create!(module_field: :Amazon).provider.do_something! 
   #=> "do something with the amazon provider config"
 ```
+
+#### Assigning a field with one Configuration from a list of static configurations
 
 
 #### Rich Java/C#-like enums
