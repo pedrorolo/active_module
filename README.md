@@ -7,6 +7,16 @@ It allows storing a reference to a `Module` or `Class` in a `:string` database f
 It automatically casts strings and symbols into modules for the purposes of object creation 
 and querying.
 
+The original idea behind this functionality was to enable idiomatic and duck typed implementations
+of the strategy design pattern. However, this is a very generic mechanism that enables many possible 
+utilizations, for instance:
+- Strategy Pattern: Composition based polymorphism
+- Rapid prototyping static domain objects without persisting them
+- Assigning a field with one Configuration from a list of static configurations
+- Rich Java/C#-like enums
+
+We provide examples for these usages in [Usage -> Examples :](#Examples) 
+
 ## Index
 
 - [Index](#index)
@@ -48,16 +58,6 @@ or
 ActiveModel::Type.register(:active_module, ActiveModule::Base)
 ActiveRecord::Type.register(:active_module, ActiveModule::Base)
 ```
-
-The original idea behind this functionality was to enable idiomatic and duck typed implementations
-of the strategy design pattern. However, this is a very generic mechanism that enables many possible 
-utilizations, for instance:
-- Strategy Pattern: Composition based polymorphism
-- Rapid prototyping static domain objects without persisting them
-- Assigning a field with one Configuration from a list of static configurations
-- Rich Java/C#-like enums
-
-We provide examples for these usages in [Usage -> Examples :](#Examples) 
 
 
 ## Usage
