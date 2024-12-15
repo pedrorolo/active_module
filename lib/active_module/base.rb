@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "active_model"
+require "active_module/modules_index"
 
 module ActiveModule
   class Base < ActiveModel::Type::Value
@@ -47,12 +48,12 @@ module ActiveModule
     private
 
     def sym_to_module(sym)
-      possible_sym_module_index[sym] ||
+      modules_index.find(sym) ||
         raise_invalid_module_value_error(sym)
     end
 
     def str_to_module(str)
-      possible_sym_module_index[str.to_sym] ||
+      modules_index.find(str.to_sym) ||
         raise_invalid_module_value_error(str)
     end
 
@@ -60,7 +61,7 @@ module ActiveModule
       raise InvalidModuleValue.new(
         str,
         possible_modules: @possible_modules,
-        possible_symbols: possible_sym_module_index.keys
+        possible_symbols: modules_index.keys
       )
     end
 
@@ -72,25 +73,8 @@ module ActiveModule
       possible_modules_set.include?(module_instance)
     end
 
-    def possible_sym_module_index
-      @possible_sym_module_index ||=
-        @possible_modules.flat_map do |module_instance|
-          possible_module_names(module_instance).map do |name|
-            [name.to_sym, module_instance]
-          end
-        end.to_h.freeze
-    end
-
-    def possible_module_names(module_instance)
-      name_parts = module_instance.name.split("::")
-      qualified_name = "::#{module_instance.name}"
-      [qualified_name].tap do |possible_names|
-        loop do
-          possible_names << name_parts.join("::").freeze
-          name_parts = name_parts.drop(1)
-          break if name_parts.empty?
-        end
-      end
+    def modules_index
+      @modules_index ||= ModulesIndex.new(@possible_modules)
     end
   end
 end
