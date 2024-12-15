@@ -9,14 +9,14 @@ and querying.
 
 ## Index
 
-- (Index)[#index]
-- (Installation)[#installation]
-- (Usage)[#usage]
-  * (Examples)[#examples]
-    - (Strategy Design Pattern)[#strategy-design-pattern]
-    - (Rapid Prototying static domain objects without persistence)[#rapid-prototying-static-domain-objects-without-persistence]
-    - (Assigning a field with one Configuration from a list of static configurations)[assigning-a-field-with-one-configuration-from-a-list-of-static-configurations]
-    - (Rich Java/C#-like enums)[#rich-javac-like-enums]
+- [Index](#index)
+- [Installation](#installation)
+- [Usage](#usage)
+  * [Examples](#examples)
+    - [Strategy Design Pattern](#strategy-design-pattern)
+    - [Rapid Prototying static domain objects without persistence](#rapid-prototying-static-domain-objects-without-persistence)
+    - [Assigning a field with one Configuration from a list of static configurations](assigning-a-field-with-one-configuration-from-a-list-of-static-configurations)
+    - [Rich Java/C#-like enums](#rich-javac-like-enums)
 
 ## Installation
 
