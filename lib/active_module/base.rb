@@ -43,6 +43,8 @@ module ActiveModule
 
     def deserialize(str)
       str&.constantize
+    rescue NameError
+      nil
     end
 
     private

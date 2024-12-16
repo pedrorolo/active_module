@@ -164,4 +164,12 @@ RSpec.describe ActiveModule::Base do
       expect(ActiveModule::Base.new(possible_modules: []).type).to eq :active_module
     end
   end
+
+  it "loads nil when what is in the database column is not a module" do
+    object = active_record_class.create!
+    ActiveRecord::Base.connection.execute(
+      "UPDATE my_objects SET strategy = 'not_a_module' WHERE id = #{object.id}"
+    )
+    expect(object.reload.strategy).to be_nil
+  end
 end
