@@ -2,7 +2,7 @@ PATH
   remote: .
   specs:
     active_module (0.1.0)
-      activerecord (~> 7.0)
+      activerecord (>= 7, < 9)
       bundler (>= 1.15.0)
 
 GEM
