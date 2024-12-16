@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require "active_model"
-require "active_module/modules_index"
+require_relative "modules_index"
 
 module ActiveModule
   class Base < ActiveModel::Type::Value
@@ -48,12 +48,12 @@ module ActiveModule
     private
 
     def sym_to_module(sym)
-      modules_index.find(sym) ||
+      modules_index[sym] ||
         raise_invalid_module_value_error(sym)
     end
 
     def str_to_module(str)
-      modules_index.find(str.to_sym) ||
+      modules_index[str.to_sym] ||
         raise_invalid_module_value_error(str)
     end
 
