@@ -135,6 +135,13 @@ RSpec.describe ActiveModule::Base do
     end.to raise_error(ActiveModule::InvalidModuleValue)
   end
 
+  it "when querying with an object different than string symbol or module"\
+  "we get failures" do
+    expect do
+      active_record_class.where(strategy: 1).load
+    end.to raise_error(ActiveModule::InvalidModuleValue)
+  end
+
   it "mass assignment works" do
     object = active_record_class.new(strategy: :MoreNesting)
     expect(object.strategy).to eq Nested::MyClass::MoreNesting
@@ -150,5 +157,11 @@ RSpec.describe ActiveModule::Base do
     object = active_record_class.new
     object.strategy = ::Nested::MyClass::MoreNesting
     expect(object.strategy).to eq Nested::MyClass::MoreNesting
+  end
+
+  describe "#type" do
+    it "returns :active_module" do
+      expect(ActiveModule::Base.new(possible_modules: []).type).to eq :active_module
+    end
   end
 end
