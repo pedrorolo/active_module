@@ -109,9 +109,9 @@ my_ar_object.module_field = "MyClass::MyModule1"
 my_ar_object.module_field #=> MyARObject::MyClass::MyModule::Module
 ```
 
-### Examples
+## Examples
 
-#### Strategy Pattern (composition-based polymorphism)
+### Strategy Pattern (composition-based polymorphism)
 
 [The Strategy design pattern](https://en.wikipedia.org/wiki/Strategy_pattern) allows composition based polymorphism. This enables runtime polymorphism (by changing the strategy in runtime), 
 and multiple-polymorphism (by composing an object of multiple strategies).
@@ -147,7 +147,7 @@ MyARObject.create!(module_field: :Strategy1).run_strategy! #=> "strategy2 called
 ```
 
 
-#### Rapid prototyping static domain objects
+### Rapid prototyping static domain objects
 
 ```ruby 
 # Provider domain Object
@@ -238,7 +238,7 @@ end
 ```
 
 
-#### Static configuration management
+### Static configuration management
 
 This example is not much different than previous one. It however stresses that the module we
 refer to might be used as a source of configuration parameters that change the behaviour of 
@@ -289,7 +289,7 @@ end
 MyARObject.create!(provider_config: :Ebay).load_page!
 ```
 
-#### Rich Java/C#-like enums
+### Rich Java/C#-like enums
 This example is only to show the possibility. 
 This would probably benefit from using a meta programming abstraction
 and there are already gems with this kind of functionality such as `enumerizable`
