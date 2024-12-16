@@ -10,7 +10,8 @@ Gem::Specification.new do |spec|
   spec.email = ["pedrorolo@gmail.com"]
 
   spec.summary = "ActiveModel/ActiveRecord module attribute type implementation"
-  spec.description = "Let's turn modules and classes into first-class active record values!"
+  spec.description =
+    "Let's turn modules and classes into first-class active record values!"
   spec.homepage = github_url
   spec.required_ruby_version = ">= 3.0.0"
 

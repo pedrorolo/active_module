@@ -161,7 +161,8 @@ RSpec.describe ActiveModule::Base do
 
   describe "#type" do
     it "returns :active_module" do
-      expect(described_class.new(possible_modules: []).type).to eq :active_module
+      expect(described_class.new(possible_modules: []).type)
+        .to eq :active_module
     end
   end
 
