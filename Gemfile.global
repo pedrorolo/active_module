@@ -14,4 +14,3 @@ gem "rubocop-rspec", "> 2.0", require: false
 gem "simplecov", require: false
 
 gem "byebug", "~> 11.0"
-gem "sqlite3", platforms: %i[ruby mswin mingw]

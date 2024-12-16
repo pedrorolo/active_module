@@ -38,7 +38,7 @@ module ActiveModule
     end
 
     def serialize(module_instance)
-      cast(module_instance).name
+      module_instance && cast(module_instance).name
     end
 
     def deserialize(str)
