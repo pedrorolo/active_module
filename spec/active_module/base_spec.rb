@@ -166,6 +166,19 @@ RSpec.describe ActiveModule::Base do
                                                             :MoreNesting)).to be_truthy
   end
 
+  it "comparission does not loop" do
+    object = active_record_class.new
+    object.strategy = :StrategyA
+    module WithComparisionRefinement
+      using ActiveModule::Comparision
+      def self.compare_module_results(m1, m2)
+        m1 == m2
+      end
+    end
+    expect(WithComparisionRefinement.compare_module_results(object.strategy,
+                                                            StrategyA)).to be_truthy
+  end
+
   it "supports qualified module names" do
     object = active_record_class.new
     object.strategy = ::Nested::MyClass::MoreNesting

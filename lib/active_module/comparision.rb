@@ -8,7 +8,7 @@ module ActiveModule
         when nil
           false
         when ::Module
-          self == other
+          super(other)
         when ::String
           (@possible_names ||= possible_names).include?(other)
         when ::Symbol
