@@ -192,11 +192,8 @@ class MyARObject < ActiveRecord::Base
             :active_module, 
             possible_modules: [Strategy1, Strategy2]
 
-  def run_strategy!
-    # here we could pass arguments to the strategy, and if 
-    # in this case strategies were classes we could also 
-    # instantiate them
-    strategy.call
+  def run_strategy!(some_args)
+    strategy.call(some_args, other_args)
   end
 end
 
