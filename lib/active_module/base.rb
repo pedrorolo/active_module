@@ -6,7 +6,7 @@ require_relative "modules_index"
 module ActiveModule
   class Base < ActiveModel::Type::Value
     def initialize(possible_modules:)
-      @possible_modules = possible_modules
+      @possible_modules = possible_modules.map { ActiveModule::Module.new(_1) }
       super()
     end
 
@@ -26,6 +26,12 @@ module ActiveModule
         sym_to_module(value)
       when ::Module
         if possible_module?(value)
+          ActiveModule::Module.new(value)
+        else
+          raise_invalid_module_value_error(value)
+        end
+      when ActiveModule::Module
+        if possible_module?(value)
           value
         else
           raise_invalid_module_value_error(value)
@@ -42,7 +48,7 @@ module ActiveModule
     end
 
     def deserialize(str)
-      str&.constantize
+      ActiveModule::Module.new(str&.constantize)
     rescue NameError
       nil
     end
