@@ -109,6 +109,20 @@ my_ar_object.module_field = "MyClass::MyModule1"
 my_ar_object.module_field #=> MyARObject::MyClass::MyModule::Module
 ```
 
+### Comparing modules with strings and symbols
+
+In order to compare modules with Strings or Symbols you'll have to use the `ActiveModule::Comparison`
+refinement. This refinement adds the method `Module#=~` to the `Module` class, but this change is
+only available within the namespace that includes the refinement.
+
+```ruby
+module YourClassOrModuleThatWantsToCompare
+  using ActiveModule::Comparison
+  def method_that_compares
+    my_ar_object.module_field =~ :MyModule1
+  end
+end
+
 ## Examples
 
 ### Strategy Pattern (composition-based polymorphism)

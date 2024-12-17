@@ -153,6 +153,13 @@ RSpec.describe ActiveModule::Base do
     expect(object.strategy).to eq Nested::MyClass::MoreNesting
   end
 
+  it "ActiveModule::Comparison#compare" do
+    object = active_record_class.new
+    object.strategy = :MoreNesting
+    expect(ActiveModule::Comparison.compare(object.strategy, :MoreNesting))
+      .to be true
+  end
+
   it "supports qualified module names" do
     object = active_record_class.new
     object.strategy = ::Nested::MyClass::MoreNesting
