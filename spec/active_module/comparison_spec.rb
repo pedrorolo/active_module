@@ -25,11 +25,27 @@ RSpec.describe ActiveModule::Comparison do
     end
   end
 
-  it "comparison works" do
+  it "comparison works with symbols" do
     object = my_class.new(module: described_class)
 
     expect(WithComparisonRefinement
       .compare_module_results(object.module,
                               :Comparison)).to be true
+  end
+
+  it "comparison works with Strings" do
+    object = my_class.new(module: described_class)
+
+    expect(WithComparisonRefinement
+      .compare_module_results(object.module,
+                              "Comparison")).to be true
+  end
+
+  it "comparison works with Modules" do
+    object = my_class.new(module: described_class)
+
+    expect(WithComparisonRefinement
+      .compare_module_results(object.module,
+                              described_class)).to be true
   end
 end

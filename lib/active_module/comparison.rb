@@ -7,16 +7,12 @@ module ActiveModule
 
       def =~(other)
         case other
-        when nil
-          false
-        when ::Module
-          super(other)
         when ::String
           (@possible_names ||= possible_names).include?(other)
         when ::Symbol
           (@possible_names ||= possible_names).include?(other.to_s)
         else
-          false
+          self == other
         end
       end
     end
