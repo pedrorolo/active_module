@@ -188,7 +188,7 @@ class MyARObject < ActiveRecord::Base
 end
 
 MyARObject.create!(module_field: :Strategy1).run_strategy! #=> "strategy1 called"
-MyARObject.create!(module_field: :Strategy1).run_strategy! #=> "strategy2 called"
+MyARObject.create!(module_field: :Strategy2).run_strategy! #=> "strategy2 called"
 ```
 
 
