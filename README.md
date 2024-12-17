@@ -25,7 +25,7 @@ Add to your gemfile:
 gem 'active_module', "~>0.1"
 ```
 
-Add to a rails initializer, such as `intializers/types.rb`
+If you are not using rails, just issue this command after loading active record
 
 ```ruby
 ActiveModule.register!
