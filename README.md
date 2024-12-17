@@ -161,6 +161,19 @@ end
 [The Strategy design pattern](https://en.wikipedia.org/wiki/Strategy_pattern) allows composition based polymorphism. This enables runtime polymorphism (by changing the strategy in runtime), 
 and multiple-polymorphism (by composing an object of multiple strategies).
 
+If you want to use classes this will do:
+```ruby
+class MyARObject < ActiveRecord::Base
+  attribute :strategy, :active_module, possible_modules: StrategySuperclass.subclasses
+
+  def run_strategy!(args)
+    strategy.new(some_args).call(other_args)
+  end
+end
+```
+
+But if you are not in the mood to define a class hierarchy for it, you can use modules instead:
+
 ```ruby
 class MyARObject < ActiveRecord::Base
   module Strategy1
