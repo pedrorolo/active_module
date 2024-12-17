@@ -153,6 +153,19 @@ RSpec.describe ActiveModule::Base do
     expect(object.strategy).to eq Nested::MyClass::MoreNesting
   end
 
+  it "comparission works" do
+    object = active_record_class.new
+    object.strategy = :MoreNesting
+    module WithComparisionRefinement
+      using ActiveModule::Comparision
+      def self.compare_module_results(m1, m2)
+        m1 == m2
+      end
+    end
+    expect(WithComparisionRefinement.compare_module_results(object.strategy,
+                                                            :MoreNesting)).to be_truthy
+  end
+
   it "supports qualified module names" do
     object = active_record_class.new
     object.strategy = ::Nested::MyClass::MoreNesting
@@ -161,8 +174,7 @@ RSpec.describe ActiveModule::Base do
 
   describe "#type" do
     it "returns :active_module" do
-      expect(described_class.new(possible_modules: []).type)
-        .to eq :active_module
+      expect(described_class.new(possible_modules: []).type).to eq :active_module
     end
   end
 
