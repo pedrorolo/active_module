@@ -14,6 +14,7 @@ Gem::Specification.new do |spec|
     "Let's turn modules and classes into first-class active record values!"
   spec.homepage = github_url
   spec.required_ruby_version = ">= 3.0.0"
+  spec.license = "MIT"
 
   #  spec.metadata["allowed_push_host"] = "TODO: Set to your gem server 'https://example.com'"
 
