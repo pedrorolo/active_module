@@ -2,7 +2,7 @@
 
 module ActiveModule
   class Railtie < Rails::Railtie
-    initializer "my_gem.configure_rails_initialization" do
+    initializer "active_module.register_attribute" do
       ActiveModule::Register.call
     end
   end
