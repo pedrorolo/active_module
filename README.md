@@ -118,10 +118,12 @@ only available within the namespace that includes the refinement.
 ```ruby
 module YourClassOrModuleThatWantsToCompare
   using ActiveModule::Comparison
+
   def method_that_compares
     my_ar_object.module_field =~ :MyModule1
   end
 end
+```
 
 ## Examples
 
