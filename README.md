@@ -19,7 +19,7 @@ You can find examples of these in [Usage -> Examples :](#Examples)
 
 ## Installation
 
-Add to your gemfile:
+Add to your gemfile - and if you are using rails - that's all you need:
 
 ```ruby
 gem 'active_module', "~>0.1"
