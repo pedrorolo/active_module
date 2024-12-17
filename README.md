@@ -17,6 +17,35 @@ This is a very generic mechanism that enables many possible utilizations, for in
 
 You can find examples of these in [Usage -> Examples :](#Examples) 
 
+## TL;DR
+
+Declare module attributes like this:
+```ruby
+class MyARObject < ActiveRecord::Base
+  attribute :module_field, 
+            :active_module, 
+            possible_modules: [MyModule1, MyClass, Nested::Module]
+end
+```
+
+Assign them like this:
+```ruby 
+object.module_field = Nested::Module
+object.module_field = :Module
+object.module_field = "Module"
+object.module_field #=> Nested::Module:Module
+```
+
+And compare them like this (optional):
+```ruby 
+module MyNameSpace
+  using ActiveModule::Comparison
+
+  object.module_field =~ :Module1
+  object.module_field =~ "Module1"
+end
+```
+
 ## Installation
 
 Add to your gemfile - and if you are using rails - that's all you need:
@@ -54,7 +83,7 @@ class MyARObject < ActiveRecord::Base
   module MyModule1; end
   module MyModule2; end
   class MyClass; 
-    module Module1; end
+    module MyModule1; end
   end
 end
 ```
@@ -63,13 +92,13 @@ You can make the field refer to one of these modules/classes like this:
 class MyARObject < ActiveRecord::Base
   attribute :module_field, 
             :active_module, 
-            possible_modules: [MyModule1, MyModule2, MyClass, MyClass::Module1]
+            possible_modules: [MyModule1, MyModule2, MyClass, MyClass::MyModule1]
 end
 ```
 And this is it! Easy!<br>
 
 ### Assigning and querying module attributes
-Now you can use this attribute in many handy ways:
+Now you can use this attribute in many handy ways!
 <br>
 <br>
 For instance, you may refer to it using module literals:
