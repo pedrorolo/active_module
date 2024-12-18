@@ -1,6 +1,6 @@
 # ActiveModule
 
-*"Modules and Classes as first-class active record values!"*
+#### *Modules and Classes as first-class active record values!*
 
 ActiveModel/ActiveRecord implementation of the Module attribute type.
 
