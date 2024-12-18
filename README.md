@@ -186,10 +186,14 @@ and multiple-polymorphism (by composing an object of multiple strategies).
 If you want to use classes this will do:
 ```ruby
 class MyARObject < ActiveRecord::Base
-  attribute :strategy, :active_module, possible_modules: StrategySuperclass.subclasses
+  attribute :strategy_class, :active_module, possible_modules: StrategySuperclass.subclasses
 
+  def strategy
+    @strategy ||= strategy_class.new(some_args_from_the_instance)
+  end
+  
   def run_strategy!(args)
-    strategy.new(some_args).call(other_args)
+    strategy.call(args)
   end
 end
 ```
