@@ -14,6 +14,10 @@ module ActiveModule
         end
       end
 
+      def possible_symbol_names_set
+        @possible_symbol_names_set ||= Set.new(possible_names.map(&:to_sym))
+      end
+
       def qualified_name
         "::#{name}"
       end
