@@ -46,9 +46,7 @@ And compare them like this:
 
 ```ruby 
 object.module_field == Nested::Module
-```
-or like this:
-```ruby
+
 module MyNameSpace
   using ActiveModule::Comparison
 
