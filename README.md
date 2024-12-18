@@ -10,12 +10,10 @@ database field in a safe and efficient way.
 - Symbols or strings refer to the modules using unqualified names.
 
 This is a very generic mechanism that enables many possible utilizations, for instance:
-- Strategy Pattern (composition-based polymorphism)
-- Rapid prototyping static domain objects
-- Static configuration management
-- Rich Java/C#-like enums
-
-You can find examples of these in [Usage -> Examples :](#Examples) 
+- **Strategy Pattern (composition-based polymorphism)**
+- **Rapid prototyping static domain objects**
+- **Static configuration management**
+- **Rich Java/C#-like enums**
 
 ## TL;DR
 
@@ -44,8 +42,13 @@ MyARObject.where(module_field: "Module")
 object.module_field #=> Nested::Module:Module
 ```
 
-And compare them like this (optional):
+And compare them like this:
+
 ```ruby 
+object.module_field == Nested::Module
+```
+or like this:
+```ruby
 module MyNameSpace
   using ActiveModule::Comparison
 
