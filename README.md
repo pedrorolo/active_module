@@ -1,13 +1,15 @@
-# ActiveModule
+
+# ActiveModule 
+![alt text](https://img.shields.io/badge/coverage-100%25-brightgreen)
 
 #### *Modules and Classes as first-class active record values!*
 
 ActiveModel/ActiveRecord implementation of the Module attribute type.
 
-- Allows storing a reference to a `Module` or `Class` (because they are modules) in a `:string` 
-database field in a safe and efficient way.
-- It automatically casts strings and symbols into modules when creating and querying objects.
-- Symbols or strings refer to the modules using unqualified names.
+- Allows storing a reference to a `Module` or `Class` in a `:string` database field
+- Automatically casts strings and symbols into modules when creating and querying objects
+- Symbols or strings refer to the modules using unqualified names
+- It is safe and efficient
 
 This is a very generic mechanism that enables many possible utilizations, for instance:
 - **Composition-based polymorphism (Strategy design pattern)**
