@@ -86,7 +86,7 @@ create_table :my_ar_objects do |t|
 end
 ```
 
-Now given this module structure:
+Now given this random module hierarchy:
 ```ruby
 class MyARObject < ActiveRecord::Base
   module MyModule1; end
