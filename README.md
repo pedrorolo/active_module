@@ -191,14 +191,15 @@ class MyARObject < ActiveRecord::Base
   def strategy
     @strategy ||= strategy_class.new(some_args_from_the_instance)
   end
-  
+
   def run_strategy!(args)
     strategy.call(args)
   end
 end
 ```
 
-But if you are not in the mood to define a class hierarchy for it, you can use modules instead:
+But if you are not in the mood to define a class hierarchy for it (or if you are performance-savy),
+you may use modules instead:
 
 ```ruby
 class MyARObject < ActiveRecord::Base
