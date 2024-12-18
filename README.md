@@ -154,6 +154,19 @@ module YourClassOrModuleThatWantsToCompare
 end
 ```
 
+or like this, if you don't want to use the refinement:
+
+```ruby
+ActiveModule::Comparison.compare(my_ar_object.module_field, :MyModule1)
+```
+
+but in this last case it would probably make more sense to simply use a module literal:
+
+```ruby
+my_ar_object.module_field == MyClass::MyModule1
+```
+
+
 ## Examples
 
 ### Strategy Pattern (composition-based polymorphism)
@@ -260,6 +273,10 @@ this is how you could do so:
 # Provider domain Object
 module Provider
   # As if the domain model class
+  def self.all
+    [Ebay, Amazon]
+  end
+
   module Base 
     def do_something!
       "do something with #{something_from_an_instance}"
@@ -283,11 +300,6 @@ module Provider
     def something_from_an_instance
       "the amazon provider config"
     end
-  end
-
-  # As if the domain model class
-  def self.all
-    [Ebay, Amazon]
   end
 end
 ```
@@ -355,6 +367,18 @@ Java/C# enums allow defining methods on the enum, which are shared across all en
 
 ```ruby
 module PipelineStage
+  module_function
+
+  def all
+    [InitialContact, InNegotiations, LostDeal, PaidOut]
+  end
+
+  def cast(stage)
+    self.all.map(&:external_provider_code).find{|code| code == stage} ||
+    self.all.map(&:database_representation).find{|code| code == stage} ||
+    self.all.map(&:frontend_representation).find{|code| code == stage} 
+  end
+
   module Base
     def external_provider_code
       @external_provider_code ||= self.name.underscore
@@ -383,18 +407,6 @@ module PipelineStage
 
   module PaidOut
     extend Base
-  end
-
-  module_function
-
-  def all
-    [InitialContact, InNegotiations, LostDeal, PaidOut]
-  end
-
-  def cast(stage)
-    self.all.map(&:external_provider_code).find{|code| code == stage} ||
-    self.all.map(&:database_representation).find{|code| code == stage} ||
-    self.all.map(&:frontend_representation).find{|code| code == stage} 
   end
 end
 

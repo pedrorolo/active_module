@@ -7,13 +7,19 @@ module ActiveModule
 
       def =~(other)
         case other
-        when ::String
-          (@possible_names ||= possible_names).include?(other)
         when ::Symbol
-          (@possible_names ||= possible_names).include?(other.to_s)
+          possible_symbol_names_set.include?(other)
+        when ::String
+          possible_symbol_names_set.include?(other.to_sym)
         else
           self == other
         end
+      end
+
+      private
+
+      def possible_symbol_names_set
+        @possible_symbol_names_set ||= Set.new(possible_names.map(&:to_sym))
       end
     end
 
