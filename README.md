@@ -36,6 +36,14 @@ object.module_field = "Module"
 object.module_field #=> Nested::Module:Module
 ```
 
+Query them like this:
+```ruby 
+MyARObject.where(module_field: Nested::Module)
+MyARObject.where(module_field: :Module)
+MyARObject.where(module_field: "Module")
+object.module_field #=> Nested::Module:Module
+```
+
 And compare them like this (optional):
 ```ruby 
 module MyNameSpace
