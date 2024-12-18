@@ -47,9 +47,12 @@ And compare them like this:
 ```ruby 
 object.module_field == Nested::Module
 
-using ActiveModule::Comparison
-object.module_field =~ :Module1
-object.module_field =~ "Module1"
+module MyNameSpace
+  using ActiveModule::Comparison
+
+  object.module_field =~ :Module1
+  object.module_field =~ "Module1"
+end
 ```
 
 ## Installation
