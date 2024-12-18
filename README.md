@@ -10,7 +10,7 @@ database field in a safe and efficient way.
 - Symbols or strings refer to the modules using unqualified names.
 
 This is a very generic mechanism that enables many possible utilizations, for instance:
-- **Strategy Pattern (composition-based polymorphism)**
+- **Composition-based polymorphism (Strategy design pattern)**
 - **Rapid prototyping static domain objects**
 - **Static configuration management**
 - **Rich Java/C#-like enums**
@@ -178,12 +178,12 @@ my_ar_object.module_field == MyClass::MyModule1
 
 ## Examples
 
-### Strategy Pattern (composition-based polymorphism)
+### Composition-based polymorphism (Strategy design pattern)
 
 [The Strategy design pattern](https://en.wikipedia.org/wiki/Strategy_pattern) allows composition based polymorphism. This enables runtime polymorphism (by changing the strategy in runtime), 
 and multiple-polymorphism (by composing an object of multiple strategies).
 
-If you want to use classes this will do:
+If you want to use classes this will do: 
 ```ruby
 class MyARObject < ActiveRecord::Base
   attribute :strategy_class, :active_module, possible_modules: StrategySuperclass.subclasses
