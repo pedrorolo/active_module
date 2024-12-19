@@ -17,6 +17,8 @@ This is a very generic mechanism that enables many possible utilizations, for in
 - **Static configuration management**
 - **Rich Java/C#-like enums**
 
+You can find examples of these in [Usage -> Examples :](#Examples) 
+
 ## TL;DR
 
 Declare module attributes like this:
