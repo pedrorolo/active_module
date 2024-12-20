@@ -1,5 +1,5 @@
 
-# ActiveModule 
+# active_module 
 ![alt text](https://img.shields.io/badge/coverage-100%25-brightgreen)
 
 #### *Modules and Classes as first-class active record values!*
