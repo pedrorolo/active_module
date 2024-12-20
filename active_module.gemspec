@@ -9,9 +9,9 @@ Gem::Specification.new do |spec|
   spec.authors = ["Pedro Rolo"]
   spec.email = ["pedrorolo@gmail.com"]
 
-  spec.summary = "ActiveModel/ActiveRecord module attribute type implementation"
+  spec.summary = "Modules and Classes as first-class active record values"
   spec.description =
-    "Let's turn modules and classes into first-class active record values!"
+    "ActiveModel/ActiveRecord module attribute type implementation"
   spec.homepage = github_url
   spec.required_ruby_version = ">= 3.0.0"
   spec.license = "MIT"
@@ -38,9 +38,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   # Uncomment to register a new dependency of your gem
-  # spec.add_dependency "example-gem", "~> 1.0"
-  #   s.add_dependency "activesupport", version
-  spec.add_dependency "activerecord", "< 9", ">= 7"
+  spec.add_dependency "activerecord", "< 9", ">= 7.1"
   spec.add_dependency "bundler", ">= 1.15.0"
 
   # For more information and examples about making a new gem, check out our

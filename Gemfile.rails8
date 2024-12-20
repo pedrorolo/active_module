@@ -3,4 +3,4 @@
 eval_gemfile("Gemfile.global")
 
 gem "sqlite3", "~> 2.1", platforms: %i[ruby mswin mingw]
-gem "activerecord", "~>8.0.0"
+gem "activerecord", "8.0.0"
