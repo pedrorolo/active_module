@@ -54,8 +54,8 @@ object.module_field == Nested::Module
 module MyNameSpace
   using ActiveModule::Comparison
 
-  object.module_field =~ :Module1
-  object.module_field =~ "Module1"
+  object.module_field =~ :Module
+  object.module_field =~ "Module"
 end
 ```
 
