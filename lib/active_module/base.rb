@@ -7,24 +7,20 @@ module ActiveModule
   class Base < ActiveModel::Type::Value
     attr_reader :possible_modules, :mapping
 
-    def initialize(possible_modules_or_mapping = nil,
+    def initialize(possible_modules_or_mapping = [],
                    possible_modules: [],
                    mapping: {})
-      @possible_modules =
-        if possible_modules_or_mapping.is_a?(Array)
-          possible_modules_or_mapping + possible_modules
-        else
-          possible_modules
-        end
-      mapping_arg = if possible_modules_or_mapping.is_a?(Hash)
-                      possible_modules_or_mapping.merge(mapping)
-                    else
-                      mapping
-                    end
-      @mapping =
-        @possible_modules.each_with_object(mapping_arg.dup) do |mod, result|
-          result[mod] ||= mod.name
-        end
+      if possible_modules_or_mapping.is_a?(Array)
+        @possible_modules =
+          (possible_modules_or_mapping + possible_modules + mapping.keys).uniq
+        @mapping = default_mapping.merge(mapping)
+      else
+        @possible_modules =
+          (possible_modules_or_mapping.keys + possible_modules + mapping.keys)
+          .uniq
+        @mapping = default_mapping.merge(possible_modules_or_mapping)
+                                  .merge(mapping)
+      end
       super()
     end
 
@@ -103,6 +99,10 @@ module ActiveModule
 
     def from_db
       @from_db ||= mapping.invert
+    end
+
+    def default_mapping
+      @possible_modules.index_by(&:name).invert
     end
   end
 end
