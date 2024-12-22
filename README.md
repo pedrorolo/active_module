@@ -64,7 +64,7 @@ end
 Add to your gemfile - and if you are using rails - that's all you need:
 
 ```ruby
-gem 'active_module', "~> 0.1"
+gem 'active_module', "~> 0.2"
 ```
 
 If you are not using rails, just issue this command after loading active record
@@ -108,6 +108,16 @@ class MyARObject < ActiveRecord::Base
             possible_modules: [MyModule1, MyModule2, MyClass, MyClass::MyModule1]
 end
 ```
+
+Optionally, you can specify how to map your modules into the database 
+(the default is the module's fully qualified name):
+```ruby
+attribute :module_field, 
+          :active_module, 
+          possible_modules: [MyModule1, MyModule2, MyClass, MyClass::MyModule1]
+          mapping: {MyModule1 => "this is the db representation of module1"}
+```
+
 And this is it! Easy!<br>
 
 ### Assigning and querying module attributes
