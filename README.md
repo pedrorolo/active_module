@@ -232,6 +232,39 @@ MyARObject.create!(module_field: :Strategy1).run_strategy! #=> "strategy1 called
 MyARObject.create!(module_field: :Strategy2).run_strategy! #=> "strategy2 called"
 ```
 
+You can later easily promote these modules to classes if you need instance variables:
+
+```ruby
+class MyARObject < ActiveRecord::Base
+  class Strategy1
+    def self.call
+      self.new.call
+    end
+
+    def call
+      "strategy1 called"
+    end
+  end
+
+  module Strategy2
+    def self.call
+      "strategy2 called"
+    end
+  end
+
+  attribute :strategy, 
+            :active_module, 
+            possible_modules: [Strategy1, Strategy2]
+
+  def run_strategy!(some_args)
+    strategy.call(some_args, other_args)
+  end
+end
+
+MyARObject.create!(module_field: :Strategy1).run_strategy! #=> "strategy1 called"
+MyARObject.create!(module_field: :Strategy2).run_strategy! #=> "strategy2 called"
+```
+
 
 ### Rapid prototyping static domain objects
 
