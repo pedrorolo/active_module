@@ -86,7 +86,7 @@ ActiveRecord::Type.register(:active_module, ActiveModule::Base)
 Add a string field to the table you want to hold a module attribute in your migrations
 ```ruby
 create_table :my_ar_objects do |t|
-  t.string :module_field
+  t.string :module_field, index: true
 end
 ```
 
