@@ -5,9 +5,33 @@ require_relative "modules_index"
 
 module ActiveModule
   class Base < ActiveModel::Type::Value
-    def initialize(possible_modules:)
-      @possible_modules = possible_modules
+    attr_reader :possible_modules, :mapping
+
+    def initialize(possible_modules_or_mapping = nil,
+                   possible_modules: [],
+                   mapping: {})
+      @possible_modules =
+        if possible_modules_or_mapping.is_a?(Array)
+          possible_modules_or_mapping + possible_modules
+        else
+          possible_modules
+        end
+      mapping_arg = if possible_modules_or_mapping.is_a?(Hash)
+                      possible_modules_or_mapping.merge(mapping)
+                    else
+                      mapping
+                    end
+      @mapping =
+        @possible_modules.each_with_object(mapping_arg.dup) do |mod, result|
+          result[mod] ||= mod.name
+        end
       super()
+    end
+
+    def ==(other)
+      other.is_a?(Base) &&
+        possible_modules == other.possible_modules &&
+        mapping == other.mapping
     end
 
     def type
@@ -38,13 +62,11 @@ module ActiveModule
     end
 
     def serialize(module_instance)
-      module_instance && cast(module_instance).name
+      mapping[cast(module_instance)]
     end
 
     def deserialize(str)
-      str&.constantize
-    rescue NameError
-      nil
+      from_db[str]
     end
 
     private
@@ -77,6 +99,10 @@ module ActiveModule
 
     def modules_index
       @modules_index ||= ModulesIndex.new(@possible_modules)
+    end
+
+    def from_db
+      @from_db ||= mapping.invert
     end
   end
 end

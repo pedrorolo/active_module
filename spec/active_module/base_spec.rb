@@ -44,6 +44,18 @@ RSpec.describe ActiveModule::Base do
     end
   end
 
+  def active_record_class_with_mapping
+    ActiveModule.register!
+    Class.new(ActiveRecord::Base) do
+      self.table_name = "my_objects"
+      attribute :strategy,
+                :active_module,
+                possible_modules: [StrategyA,
+                                   StrategyB],
+                mapping: { StrategyA => "s1" }
+    end
+  end
+
   it "is possible to assign using modules" do
     object = active_record_class.create!(strategy: StrategyA)
     expect(object.reload.strategy).to eq StrategyA
@@ -179,5 +191,24 @@ RSpec.describe ActiveModule::Base do
       "UPDATE my_objects SET strategy = 'not_a_module' WHERE id = #{object.id}"
     )
     expect(object.reload.strategy).to be_nil
+  end
+
+  it "db mapping works" do
+    model = active_record_class_with_mapping.create!(strategy: StrategyA)
+    expect(model.reload.attributes_before_type_cast["strategy"]).to eq "s1"
+  end
+
+  describe "#initialize" do
+    it "initializing with positional arguments "\
+    "is the same as with possible_modules" do
+      expect(described_class.new([StrategyA, StrategyB]))
+        .to eq described_class.new(possible_modules: [StrategyA, StrategyB])
+    end
+
+    it "initializing with positional arguments is the same as with mapping" do
+      expect(described_class.new({ StrategyA => "s1", StrategyB => "s2" }))
+        .to eq described_class.new(mapping: { StrategyA => "s1",
+                                              StrategyB => "s2" })
+    end
   end
 end
