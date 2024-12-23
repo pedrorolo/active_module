@@ -1,5 +1,6 @@
 
-# active_module 
+# active_module
+[![Gem Version](https://badge.fury.io/rb/active_module.svg?icon=si%3Arubygems)](https://badge.fury.io/rb/active_module)
 ![alt text](https://img.shields.io/badge/coverage-100%25-brightgreen)
 
 #### *Modules and Classes as first-class active record values!*
