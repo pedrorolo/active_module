@@ -1,7 +1,7 @@
 
 # active_module
 [![Gem Version](https://img.shields.io/gem/v/active_module)](https://rubygems.org/gems/active_module)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](https://opensource.org/licenses/MIT)
 [![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/pedrorolo/active_module/main.yml)](https://github.com/pedrorolo/active_module/blob/main/Rakefile)
 [![100% Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)](https://github.com/pedrorolo/active_module/blob/main/spec/spec_helper.rb)
 [![Gem Total Downloads](https://img.shields.io/gem/dt/active_module?style=flat)](https://rubygems.org/gems/active_module)
