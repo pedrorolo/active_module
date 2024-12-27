@@ -1,8 +1,10 @@
 
 # active_module
-[![Gem Version](https://badge.fury.io/rb/active_module.svg?icon=si%3Arubygems)](https://badge.fury.io/rb/active_module)
-![alt text](https://img.shields.io/badge/coverage-100%25-brightgreen)
+[![Gem Version](https://badge.fury.io/rb/active_module.svg)](https://badge.fury.io/rb/active_module)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![100% Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)
 ![Gem Total Downloads](https://img.shields.io/gem/dt/active_module?style=flat)
+
 
 
 #### *Modules and Classes as first-class active record values!*
