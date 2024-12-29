@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative "module_refinement"
-
 # Indexes modules by symbols of their qualified and unqualified names.
 module ActiveModule
   class ModulesIndex
