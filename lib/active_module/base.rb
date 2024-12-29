@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-require "active_model"
-require_relative "modules_index"
-
 module ActiveModule
   class Base < ActiveModel::Type::Value
     attr_reader :possible_modules, :mapping
