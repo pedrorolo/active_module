@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    active_module (0.5.0)
+    active_module (0.6.0)
       activemodel (>= 7.1, < 9)
       zeitwerk (~> 2.7)
 

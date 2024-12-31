@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
 module ActiveModule
-  VERSION = "0.6.0"
+  class Enum
+  end
 end

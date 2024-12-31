@@ -30,7 +30,7 @@ RSpec.describe ActiveModule::Base do
     end
   end
 
-  def active_record_class
+  let(:active_record_class) do
     ActiveModule.register!
     Class.new(ActiveRecord::Base) do
       self.table_name = "my_objects"
@@ -44,7 +44,7 @@ RSpec.describe ActiveModule::Base do
     end
   end
 
-  def active_record_class_with_mapping
+  let(:active_record_class_with_mapping) do
     ActiveModule.register!
     Class.new(ActiveRecord::Base) do
       self.table_name = "my_objects"
@@ -165,13 +165,6 @@ RSpec.describe ActiveModule::Base do
     expect(object.strategy).to eq Nested::MyClass::MoreNesting
   end
 
-  it "ActiveModule::Comparison#compare" do
-    object = active_record_class.new
-    object.strategy = :MoreNesting
-    expect(ActiveModule::Comparison.compare(object.strategy, :MoreNesting))
-      .to be true
-  end
-
   it "supports qualified module names" do
     object = active_record_class.new
     object.strategy = ::Nested::MyClass::MoreNesting
@@ -209,6 +202,28 @@ RSpec.describe ActiveModule::Base do
       expect(described_class.new({ StrategyA => "s1", StrategyB => "s2" }))
         .to eq described_class.new(mapping: { StrategyA => "s1",
                                               StrategyB => "s2" })
+    end
+  end
+
+  context "when using the enum_compatibility option" do
+    let(:active_record_class) do
+      ActiveModule.register!
+      Class.new(ActiveRecord::Base) do
+        self.table_name = "my_objects"
+        attribute :strategy,
+                  :active_module,
+                  possible_modules: [StrategyA,
+                                     StrategyB,
+                                     Nested::StrategyA,
+                                     Nested::MyClass,
+                                     Nested::MyClass::MoreNesting],
+                  enum_compatibility: true
+      end
+    end
+
+    it "is possible to assign using underscored symbols" do
+      object = active_record_class.create!(strategy: :more_nesting)
+      expect(object.reload.strategy).to eq Nested::MyClass::MoreNesting
     end
   end
 end
