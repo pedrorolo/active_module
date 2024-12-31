@@ -6,7 +6,9 @@ module ActiveModule
 
     def initialize(possible_modules_or_mapping = [],
                    possible_modules: [],
-                   mapping: {})
+                   mapping: {},
+                   enum_compatibility: false)
+      @enum_compatibility = enum_compatibility
       if possible_modules_or_mapping.is_a?(Array)
         @possible_modules =
           (possible_modules_or_mapping + possible_modules + mapping.keys).uniq
@@ -91,7 +93,9 @@ module ActiveModule
     end
 
     def modules_index
-      @modules_index ||= ModulesIndex.new(@possible_modules)
+      @modules_index ||=
+        (@enum_compatibility ? Enum::ModulesIndex : ModulesIndex)
+        .new(@possible_modules)
     end
 
     def from_db

@@ -12,12 +12,18 @@ module ActiveModule
       @modules = modules
     end
 
+    protected
+
+    def possible_names(module_instance)
+      module_instance.possible_names
+    end
+
     private
 
     def index
       @index ||=
         @modules.flat_map do |module_instance|
-          module_instance.possible_names.map do |name|
+          possible_names(module_instance).map do |name|
             [name.to_sym, module_instance]
           end
         end.to_h.freeze
