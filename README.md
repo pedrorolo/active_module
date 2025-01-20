@@ -425,10 +425,8 @@ MyARObject.create!(provider_config: :Ebay).load_page!
 
 ### Rich Java/C#-like enums
 This example is only to show the possibility. 
-This would probably benefit from using a meta programming abstraction
-and there are already gems with this kind of functionality such as `enumerizable`
-
-In a real world project, I guess it would rather make sense to extend `ActiveModule::Base` or even `ActiveModel::Type::Value`. But here it goes for the sake of example.
+This would probably benefit from using a meta programming abstraction and we will provide something
+like that in the future.
 
 Java/C# enums allow defining methods on the enum, which are shared across all enum values:
 
