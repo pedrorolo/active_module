@@ -6,10 +6,10 @@ checking for whether -fvisibility=hidden is accepted as CFLAGS... yes
 creating Makefile
 
 current directory: /Users/pedrorolo/workspace/active_module/vendor/bundle/ruby/4.0.0/gems/prism-1.9.0/ext/prism
-make -j11 DESTDIR\= sitearchdir\=./.gem.20260317-69537-4ttrkv sitelibdir\=./.gem.20260317-69537-4ttrkv clean
+make -j11 DESTDIR\= sitearchdir\=./.gem.20260513-59672-se7yem sitelibdir\=./.gem.20260513-59672-se7yem clean
 
 current directory: /Users/pedrorolo/workspace/active_module/vendor/bundle/ruby/4.0.0/gems/prism-1.9.0/ext/prism
-make -j11 DESTDIR\= sitearchdir\=./.gem.20260317-69537-4ttrkv sitelibdir\=./.gem.20260317-69537-4ttrkv
+make -j11 DESTDIR\= sitearchdir\=./.gem.20260513-59672-se7yem sitelibdir\=./.gem.20260513-59672-se7yem
 compiling api_node.c
 compiling api_pack.c
 compiling extension.c
@@ -37,8 +37,8 @@ compiling ./../../src/util/pm_strpbrk.c
 linking shared-object prism/prism.bundle
 
 current directory: /Users/pedrorolo/workspace/active_module/vendor/bundle/ruby/4.0.0/gems/prism-1.9.0/ext/prism
-make -j11 DESTDIR\= sitearchdir\=./.gem.20260317-69537-4ttrkv sitelibdir\=./.gem.20260317-69537-4ttrkv install
-/opt/homebrew/opt/coreutils/bin/ginstall -c -m 0755 prism.bundle ./.gem.20260317-69537-4ttrkv/prism
+make -j11 DESTDIR\= sitearchdir\=./.gem.20260513-59672-se7yem sitelibdir\=./.gem.20260513-59672-se7yem install
+/opt/homebrew/opt/coreutils/bin/ginstall -c -m 0755 prism.bundle ./.gem.20260513-59672-se7yem/prism
 
 current directory: /Users/pedrorolo/workspace/active_module/vendor/bundle/ruby/4.0.0/gems/prism-1.9.0/ext/prism
-make DESTDIR\= sitearchdir\=./.gem.20260317-69537-4ttrkv sitelibdir\=./.gem.20260317-69537-4ttrkv clean
+make DESTDIR\= sitearchdir\=./.gem.20260513-59672-se7yem sitelibdir\=./.gem.20260513-59672-se7yem clean

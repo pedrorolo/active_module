@@ -6,6 +6,7 @@
 /pkg/
 /spec/reports/
 /tmp/
+vendor/*
 .DS_Store
 .byebug_history
 
