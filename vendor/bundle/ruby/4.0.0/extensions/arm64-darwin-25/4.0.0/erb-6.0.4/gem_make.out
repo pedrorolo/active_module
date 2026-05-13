@@ -1,0 +1,19 @@
+current directory: /Users/pedrorolo/workspace/active_module/vendor/bundle/ruby/4.0.0/gems/erb-6.0.4/ext/erb/escape
+/Users/pedrorolo/.rvm/rubies/ruby-4.0.1/bin/ruby extconf.rb
+checking for rb_ext_ractor_safe() in ruby.h... yes
+creating Makefile
+
+current directory: /Users/pedrorolo/workspace/active_module/vendor/bundle/ruby/4.0.0/gems/erb-6.0.4/ext/erb/escape
+make -j11 DESTDIR\= sitearchdir\=./.gem.20260513-15926-u58hx1 sitelibdir\=./.gem.20260513-15926-u58hx1 clean
+
+current directory: /Users/pedrorolo/workspace/active_module/vendor/bundle/ruby/4.0.0/gems/erb-6.0.4/ext/erb/escape
+make -j11 DESTDIR\= sitearchdir\=./.gem.20260513-15926-u58hx1 sitelibdir\=./.gem.20260513-15926-u58hx1
+compiling escape.c
+linking shared-object erb/escape.bundle
+
+current directory: /Users/pedrorolo/workspace/active_module/vendor/bundle/ruby/4.0.0/gems/erb-6.0.4/ext/erb/escape
+make -j11 DESTDIR\= sitearchdir\=./.gem.20260513-15926-u58hx1 sitelibdir\=./.gem.20260513-15926-u58hx1 install
+/opt/homebrew/opt/coreutils/bin/ginstall -c -m 0755 escape.bundle ./.gem.20260513-15926-u58hx1/erb
+
+current directory: /Users/pedrorolo/workspace/active_module/vendor/bundle/ruby/4.0.0/gems/erb-6.0.4/ext/erb/escape
+make DESTDIR\= sitearchdir\=./.gem.20260513-15926-u58hx1 sitelibdir\=./.gem.20260513-15926-u58hx1 clean

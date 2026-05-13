@@ -171,6 +171,11 @@ RSpec.describe ActiveModule::Base do
     expect(object.strategy).to eq Nested::MyClass::MoreNesting
   end
 
+  it "assigns nil to strategy" do
+    object = active_record_class.create!(strategy: nil)
+    expect(object.reload.strategy).to be_nil
+  end
+
   describe "#type" do
     it "returns :active_module" do
       expect(described_class.new(possible_modules: []).type)

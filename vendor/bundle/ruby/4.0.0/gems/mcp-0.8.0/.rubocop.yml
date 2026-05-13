@@ -1,0 +1,15 @@
+inherit_gem:
+  rubocop-shopify: rubocop.yml
+
+plugins:
+  - rubocop-minitest
+  - rubocop-rake
+
+AllCops:
+  TargetRubyVersion: 2.7
+
+Gemspec/DevelopmentDependencies:
+  Enabled: true
+
+Minitest/LiteralAsActualArgument:
+  Enabled: true
