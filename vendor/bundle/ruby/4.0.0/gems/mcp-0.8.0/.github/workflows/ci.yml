@@ -1,0 +1,54 @@
+name: CI
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    strategy:
+      matrix:
+        entry:
+          - { ruby: '2.7', allowed-failure: false }
+          - { ruby: '3.0', allowed-failure: false }
+          - { ruby: '3.1', allowed-failure: false }
+          - { ruby: '3.2', allowed-failure: false }
+          - { ruby: '3.3', allowed-failure: false }
+          - { ruby: '3.4', allowed-failure: false }
+          - { ruby: '4.0', allowed-failure: false }
+          - { ruby: 'head', allowed-failure: true }
+    name: Test Ruby ${{ matrix.entry.ruby }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.entry.ruby }}
+          bundler-cache: true
+      - run: bundle exec rake test
+        continue-on-error: ${{ matrix.entry.allowed-failure }}
+
+  rubocop:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    name: RuboCop
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 4.0 # Specify the latest supported Ruby version.
+          bundler-cache: true
+      - run: bundle exec rake rubocop
+
+  yard:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    name: YARD Documentation
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 4.0 # Specify the latest supported Ruby version.
+          bundler-cache: true
+      - run: bundle exec yard --no-output

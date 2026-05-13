@@ -1,0 +1,29 @@
+current directory: /Users/pedrorolo/workspace/active_module/vendor/bundle/ruby/4.0.0/gems/psych-5.3.1/ext/psych
+/Users/pedrorolo/.rvm/rubies/ruby-4.0.1/bin/ruby extconf.rb
+checking for pkg-config for yaml-0.1... ["-I/opt/homebrew/Cellar/libyaml/0.2.5/include ", "-L/opt/homebrew/Cellar/libyaml/0.2.5/lib", "-lyaml"]
+creating Makefile
+
+current directory: /Users/pedrorolo/workspace/active_module/vendor/bundle/ruby/4.0.0/gems/psych-5.3.1/ext/psych
+make -j11 DESTDIR\= sitearchdir\=./.gem.20260317-69537-9mqfag sitelibdir\=./.gem.20260317-69537-9mqfag clean
+cd libyaml && /Library/Developer/CommandLineTools/usr/bin/make clean
+/bin/sh: line 0: cd: libyaml: No such file or directory
+make: [clean-so] Error 1 (ignored)
+
+current directory: /Users/pedrorolo/workspace/active_module/vendor/bundle/ruby/4.0.0/gems/psych-5.3.1/ext/psych
+make -j11 DESTDIR\= sitearchdir\=./.gem.20260317-69537-9mqfag sitelibdir\=./.gem.20260317-69537-9mqfag
+compiling psych.c
+compiling psych_emitter.c
+compiling psych_parser.c
+compiling psych_to_ruby.c
+compiling psych_yaml_tree.c
+linking shared-object psych.bundle
+
+current directory: /Users/pedrorolo/workspace/active_module/vendor/bundle/ruby/4.0.0/gems/psych-5.3.1/ext/psych
+make -j11 DESTDIR\= sitearchdir\=./.gem.20260317-69537-9mqfag sitelibdir\=./.gem.20260317-69537-9mqfag install
+/opt/homebrew/opt/coreutils/bin/ginstall -c -m 0755 psych.bundle ./.gem.20260317-69537-9mqfag
+
+current directory: /Users/pedrorolo/workspace/active_module/vendor/bundle/ruby/4.0.0/gems/psych-5.3.1/ext/psych
+make DESTDIR\= sitearchdir\=./.gem.20260317-69537-9mqfag sitelibdir\=./.gem.20260317-69537-9mqfag clean
+cd libyaml && /Library/Developer/CommandLineTools/usr/bin/make clean
+/bin/sh: line 0: cd: libyaml: No such file or directory
+make: [clean-so] Error 1 (ignored)

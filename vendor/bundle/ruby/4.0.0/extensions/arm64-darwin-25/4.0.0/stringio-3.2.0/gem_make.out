@@ -1,0 +1,19 @@
+current directory: /Users/pedrorolo/workspace/active_module/vendor/bundle/ruby/4.0.0/gems/stringio-3.2.0/ext/stringio
+/Users/pedrorolo/.rvm/rubies/ruby-4.0.1/bin/ruby extconf.rb
+checking for rb_io_mode_t in ruby/io.h... yes
+creating Makefile
+
+current directory: /Users/pedrorolo/workspace/active_module/vendor/bundle/ruby/4.0.0/gems/stringio-3.2.0/ext/stringio
+make -j11 DESTDIR\= sitearchdir\=./.gem.20260317-69537-5rymn0 sitelibdir\=./.gem.20260317-69537-5rymn0 clean
+
+current directory: /Users/pedrorolo/workspace/active_module/vendor/bundle/ruby/4.0.0/gems/stringio-3.2.0/ext/stringio
+make -j11 DESTDIR\= sitearchdir\=./.gem.20260317-69537-5rymn0 sitelibdir\=./.gem.20260317-69537-5rymn0
+compiling stringio.c
+linking shared-object stringio.bundle
+
+current directory: /Users/pedrorolo/workspace/active_module/vendor/bundle/ruby/4.0.0/gems/stringio-3.2.0/ext/stringio
+make -j11 DESTDIR\= sitearchdir\=./.gem.20260317-69537-5rymn0 sitelibdir\=./.gem.20260317-69537-5rymn0 install
+/opt/homebrew/opt/coreutils/bin/ginstall -c -m 0755 stringio.bundle ./.gem.20260317-69537-5rymn0
+
+current directory: /Users/pedrorolo/workspace/active_module/vendor/bundle/ruby/4.0.0/gems/stringio-3.2.0/ext/stringio
+make DESTDIR\= sitearchdir\=./.gem.20260317-69537-5rymn0 sitelibdir\=./.gem.20260317-69537-5rymn0 clean
