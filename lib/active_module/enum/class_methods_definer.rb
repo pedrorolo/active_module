@@ -30,8 +30,8 @@ module ActiveModule
         end
       end
 
-      def define_fields_method(attribute_name, modules)
-        fields = build_fields_map(modules)
+      def define_fields_method(attribute_name, modules, mapping)
+        fields = build_fields_map(modules, mapping)
         name = attribute_name.to_s.pluralize
         return if singleton_methods.include?(name.to_sym)
         return if respond_to?(name)
@@ -39,9 +39,9 @@ module ActiveModule
         define_singleton_method(name) { fields }
       end
 
-      def build_fields_map(modules)
+      def build_fields_map(modules, mapping)
         modules.each_with_object({}) do |mod, h|
-          h[mod] = mod.name
+          h[mod] = mapping[mod] || mod.name
         end
       end
     end
