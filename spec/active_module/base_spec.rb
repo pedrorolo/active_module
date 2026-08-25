@@ -14,6 +14,12 @@ end
 
 module RandomModule; end
 
+module Lime
+  module Banana
+    module Strawberry; end
+  end
+end
+
 RSpec.describe ActiveModule::Base do
   before do
     require "active_record"
@@ -210,7 +216,7 @@ RSpec.describe ActiveModule::Base do
     end
   end
 
-  context "when using the enum_compatibility option" do
+  context "with underscore-case module name resolution" do
     let(:active_record_class) do
       ActiveModule.register!
       Class.new(ActiveRecord::Base) do
@@ -221,14 +227,106 @@ RSpec.describe ActiveModule::Base do
                                      StrategyB,
                                      Nested::StrategyA,
                                      Nested::MyClass,
-                                     Nested::MyClass::MoreNesting],
-                  enum_compatibility: true
+                                     Nested::MyClass::MoreNesting,
+                                     Lime::Banana::Strawberry]
       end
     end
 
     it "is possible to assign using underscored symbols" do
       object = active_record_class.create!(strategy: :more_nesting)
       expect(object.reload.strategy).to eq Nested::MyClass::MoreNesting
+    end
+
+    it "assigns fully underscored nested module name" do
+      strategy = :lime_banana_strawberry
+      object = active_record_class.create!(strategy: strategy)
+      expect(object.reload.strategy).to eq Lime::Banana::Strawberry
+    end
+
+    it "assigns partially underscored nested module name" do
+      strategy = :banana_strawberry
+      object = active_record_class.create!(strategy: strategy)
+      expect(object.reload.strategy).to eq Lime::Banana::Strawberry
+    end
+
+    it "assigns demodulized underscored module name" do
+      object = active_record_class.create!(strategy: :strawberry)
+      expect(object.reload.strategy).to eq Lime::Banana::Strawberry
+    end
+
+    it "queries using fully underscored nested module name" do
+      active_record_class.create!(strategy: Lime::Banana::Strawberry)
+      strategy = :lime_banana_strawberry
+      found = active_record_class.find_by(strategy: strategy)
+      expect(found.strategy).to eq Lime::Banana::Strawberry
+    end
+
+    it "queries using partially underscored nested module name" do
+      active_record_class.create!(strategy: Lime::Banana::Strawberry)
+      strategy = :banana_strawberry
+      found = active_record_class.find_by(strategy: strategy)
+      expect(found.strategy).to eq Lime::Banana::Strawberry
+    end
+
+    it "is possible to query using demodulized underscored module name" do
+      active_record_class.create!(strategy: Lime::Banana::Strawberry)
+      expect(active_record_class.find_by(strategy: :strawberry).strategy)
+        .to eq Lime::Banana::Strawberry
+    end
+  end
+
+  context "with ambiguous module names" do
+    let(:active_record_class) do
+      ActiveModule.register!
+      Class.new(ActiveRecord::Base) do
+        self.table_name = "my_objects"
+        attribute :strategy,
+                  :active_module,
+                  possible_modules: [
+                    StrategyA, StrategyB,
+                    Nested::StrategyA
+                  ]
+      end
+    end
+
+    it "resolves ambiguous symbol assignment to flat" do
+      object = active_record_class.new(
+        strategy: :strategy_a
+      )
+      expect(object.strategy).to eq StrategyA
+    end
+
+    it "resolves ambiguous string assignment to flat" do
+      object = active_record_class.new(
+        strategy: "StrategyA"
+      )
+      expect(object.strategy).to eq StrategyA
+    end
+
+    it "resolves ambiguous symbol query to flat" do
+      active_record_class.create!(
+        strategy: StrategyA
+      )
+      active_record_class.create!(
+        strategy: Nested::StrategyA
+      )
+      found = active_record_class.find_by(
+        strategy: :strategy_a
+      )
+      expect(found.strategy).to eq StrategyA
+    end
+
+    it "resolves ambiguous string query to flat" do
+      active_record_class.create!(
+        strategy: StrategyA
+      )
+      active_record_class.create!(
+        strategy: Nested::StrategyA
+      )
+      found = active_record_class.find_by(
+        strategy: "StrategyA"
+      )
+      expect(found.strategy).to eq StrategyA
     end
   end
 end
