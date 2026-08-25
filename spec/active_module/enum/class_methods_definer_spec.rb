@@ -146,10 +146,34 @@ RSpec.describe ActiveModule::Enum::ClassMethodsDefiner do
   end
 
   describe "fields method" do
+    let(:mapped_klass) do
+      Class.new(ActiveRecord::Base) do
+        self.table_name = "enum_test_objects"
+        attribute :status,
+                  :active_module,
+                  possible_modules: [
+                    EnumTestModules::StatusA,
+                    EnumTestModules::StatusB
+                  ],
+                  mapping: {
+                    EnumTestModules::StatusA => "m1"
+                  }
+        active_module_enum :status
+      end
+    end
+
     it "returns a hash of modules to fully qualified names" do
       expect(klass.statuses).to eq(
         EnumTestModules::StatusA =>
           "EnumTestModules::StatusA",
+        EnumTestModules::StatusB =>
+          "EnumTestModules::StatusB"
+      )
+    end
+
+    it "takes custom mappings into account" do
+      expect(mapped_klass.statuses).to eq(
+        EnumTestModules::StatusA => "m1",
         EnumTestModules::StatusB =>
           "EnumTestModules::StatusB"
       )

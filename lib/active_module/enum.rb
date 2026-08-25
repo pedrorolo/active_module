@@ -24,7 +24,7 @@ module ActiveModule
       )
       mods = type.possible_modules
       define_enum_methods(attribute_name, mods, opts)
-      define_fields_method(attribute_name, mods)
+      define_fields_method(attribute_name, mods, type.mapping)
     end
 
     private
