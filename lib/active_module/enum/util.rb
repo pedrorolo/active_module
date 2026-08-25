@@ -3,12 +3,7 @@
 module ActiveModule
   module Enum
     module Util
-      def underscored_names(mod)
-        parts = mod.name.split("::")
-        (1..parts.length).map do |i|
-          parts.last(i).map(&:underscore).join("_")
-        end
-      end
+      using ModuleRefinement
 
       def determine_prefix(attribute_name, prefix, suffix)
         if prefix.is_a?(String)
@@ -63,7 +58,7 @@ module ActiveModule
 
       def build_ambiguity_map(modules)
         modules.each_with_object({}) do |mod, h|
-          underscored_names(mod).each do |name|
+          mod.underscored_names.each do |name|
             (h[name] ||= []) << mod
           end
         end
@@ -71,7 +66,7 @@ module ActiveModule
 
       def build_unique_names_map(modules, ambiguity)
         modules.each_with_object({}) do |mod, h|
-          underscored_names(mod).each do |name|
+          mod.underscored_names.each do |name|
             next if ambiguity[name].size > 1
 
             (h[mod] ||= []) << name

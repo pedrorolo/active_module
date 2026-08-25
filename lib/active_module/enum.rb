@@ -2,6 +2,7 @@
 
 module ActiveModule
   module Enum
+    using ModuleRefinement
     include Util
     include InstanceMethodsDefiner
     include ClassMethodsDefiner
@@ -64,7 +65,7 @@ module ActiveModule
 
     def generate_methods(attribute_name, mod, opts,
                          maps, existing)
-      underscored_names(mod).each do |value_name|
+      mod.underscored_names.each do |value_name|
         warn_if_ambiguous(mod, value_name, opts, maps)
         if opts[:instance_methods]
           define_instance_methods(

@@ -16,6 +16,13 @@ module ActiveModule
         "::#{name}"
       end
 
+      def underscored_names
+        parts = name.split("::")
+        (1..parts.length).map do |i|
+          parts.last(i).map(&:underscore).join("_")
+        end
+      end
+
       private
 
       def colon_delimited_names
@@ -26,13 +33,6 @@ module ActiveModule
             name_parts = name_parts.drop(1)
             break if name_parts.empty?
           end
-        end
-      end
-
-      def underscored_names
-        parts = name.split("::")
-        (1..parts.length).map do |i|
-          parts.last(i).map(&:underscore).join("_")
         end
       end
     end

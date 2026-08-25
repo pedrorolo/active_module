@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+using ActiveModule::ModuleRefinement
+
 RSpec.describe ActiveModule::Enum::Util do
   let(:klass) do
     Class.new(ActiveRecord::Base) do
@@ -12,22 +14,17 @@ RSpec.describe ActiveModule::Enum::Util do
     end
   end
 
-  describe "#underscored_names" do
+  describe "ModuleRefinement#underscored_names" do
     it "returns demodulized name for flat module" do
-      names = klass.send(
-        :underscored_names,
-        EnumTestModules::StatusA
-      )
+      names = EnumTestModules::StatusA.underscored_names
       expect(names).to eq(
         %w[status_a enum_test_modules_status_a]
       )
     end
 
     it "returns all nesting levels for nested module" do
-      names = klass.send(
-        :underscored_names,
-        EnumTestModules::Nested::StatusA
-      )
+      names = EnumTestModules::Nested::StatusA
+              .underscored_names
       expect(names).to eq(
         %w[status_a nested_status_a
            enum_test_modules_nested_status_a]
