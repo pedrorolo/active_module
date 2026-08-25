@@ -3,7 +3,6 @@
 require "simplecov"
 SimpleCov.minimum_coverage 100
 SimpleCov.start
-
 require "active_record"
 require "active_module"
 require "byebug"

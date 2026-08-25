@@ -1,4 +1,3 @@
-
 # active_module
 [![Gem Version](https://img.shields.io/gem/v/active_module)](https://rubygems.org/gems/active_module)
 [![License: MIT](https://img.shields.io/badge/license-MIT-brightgreen.svg)](https://opensource.org/licenses/MIT)
@@ -6,9 +5,7 @@
 [![100% Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)](https://github.com/pedrorolo/active_module/blob/main/spec/spec_helper.rb)
 [![Gem Total Downloads](https://img.shields.io/gem/dt/active_module?style=flat)](https://bestgems.org/gems/active_module)
 
-
-
-#### *Modules and Classes as first-class active record values!*
+*Modules and Classes as first-class active record values!*
 
 ActiveModel/ActiveRecord implementation of the Module attribute type.
 
@@ -23,38 +20,46 @@ This is a very generic mechanism that enables many possible utilizations, for in
 - **Static configuration management**
 - **Rich Java/C#-like enums**
 
-You can find examples of these in [Usage -> Examples](#Examples).
+You can find examples of these in [Usage -> Examples](#examples).
 
 ## TL;DR
 
 Declare module attributes like this:
+
 ```ruby
 class MyARObject < ActiveRecord::Base
-  attribute :module_field, 
-            :active_module, 
+  attribute :module_field,
+            :active_module,
             possible_modules: [MyModule1, MyClass, Nested::Module]
+
+  # Optional: adds Rails-enum-like helpers (my_module1?, my_module1!,
+  # with_my_module1, ...). Drop this line if you don't need them:
+  active_module_enum :module_field
 end
 ```
 
 Assign them like this:
-```ruby 
+
+```ruby
 object.module_field = Nested::Module
 object.module_field = :Module
 object.module_field = "Module"
-object.module_field #=> Nested::Module:Module
+object.module_field = :nested_module          # underscored nested name
+object.module_field                           #=> Nested::Module
 ```
 
 Query them like this:
-```ruby 
+
+```ruby
 MyARObject.where(module_field: Nested::Module)
 MyARObject.where(module_field: :Module)
 MyARObject.where(module_field: "Module")
-object.module_field #=> Nested::Module:Module
+MyARObject.where(module_field: :nested_module) # underscored nested name
 ```
 
 And compare them like this:
 
-```ruby 
+```ruby
 object.module_field == Nested::Module
 
 module MyNameSpace
@@ -62,6 +67,7 @@ module MyNameSpace
 
   object.module_field =~ :Module
   object.module_field =~ "Module"
+  object.module_field =~ :nested_module     # underscored nested name
 end
 ```
 
@@ -70,7 +76,7 @@ end
 Add to your gemfile - and if you are using rails - that's all you need:
 
 ```ruby
-gem 'active_module', "~> 0.6"
+gem "active_module", "~> 0.8"
 ```
 
 If you are not using rails, just issue this command after loading active record
@@ -89,7 +95,8 @@ ActiveRecord::Type.register(:active_module, ActiveModule::Base)
 
 ## Usage
 
-Add a string field to the table you want to hold a module attribute in your migrations
+Add a string field to the table you want to hold a module attribute in your migrations:
+
 ```ruby
 create_table :my_ar_objects do |t|
   t.string :module_field, index: true
@@ -97,74 +104,120 @@ end
 ```
 
 Now given this random module hierarchy:
+
 ```ruby
 class MyARObject < ActiveRecord::Base
   module MyModule1; end
   module MyModule2; end
-  class MyClass; 
+
+  class MyClass
     module MyModule1; end
   end
 end
 ```
+
 You can make the field refer to one of these modules/classes like this:
+
 ```ruby
 class MyARObject < ActiveRecord::Base
-  attribute :module_field, 
-            :active_module, 
+  attribute :module_field,
+            :active_module,
             possible_modules: [MyModule1, MyModule2, MyClass, MyClass::MyModule1]
 end
 ```
 
-Optionally, you can specify how to map your modules into the database 
+Optionally, you can specify how to map your modules into the database
 (the default is the module's fully qualified name):
+
 ```ruby
-attribute :module_field, 
-          :active_module, 
-          possible_modules: [MyModule1, MyModule2, MyClass, MyClass::MyModule1]
-          mapping: {MyModule1 => "this is the db representation of module1"}
+attribute :module_field,
+          :active_module,
+          possible_modules: [MyModule1, MyModule2, MyClass, MyClass::MyModule1],
+          mapping: { MyModule1 => "m1" }
 ```
 
-And this is it! Easy!<br>
+Modules not included in the mapping hash will use their fully qualified
+name as the database representation. Assignment and querying still work
+with module literals, symbols, and strings:
+
+```ruby
+my_ar_object.module_field = :MyModule1
+my_ar_object.module_field #=> MyARObject::MyModule1
+
+MyARObject.where(module_field: :MyModule1)
+```
+
+The mapping only affects what is stored in the database column.
+
+And this is it! Easy!
 
 ### Assigning and querying module attributes
+
 Now you can use this attribute in many handy ways!
-<br>
-<br>
-For instance, you may refer to it using module literals:
+
+The most ergonomic way is to use underscored symbols. For flat modules,
+use the underscored name directly:
+
 ```ruby
+MyARObject.create!(module_field: :my_module1)
+
+MyARObject.where(module_field: :my_module1)
+
+my_ar_object.module_field = :my_module1
+
+my_ar_object.module_field #=> MyARObject::MyModule1
+```
+
+Nested modules can be referenced using underscored symbols at any
+nesting level:
+
+```ruby
+MyARObject.create!(module_field: :my_class_my_module1)  # partial nesting
+MyARObject.create!(module_field: :my_module1)           # demodulized name
+MyARObject.where(module_field: :my_class_my_module1)    # all segments joined
+
+my_ar_object.module_field = :my_class_my_module1
+my_ar_object.module_field #=> MyARObject::MyClass::MyModule1
+```
+
+When a demodulized name is ambiguous (shared by modules at different
+nesting levels), the least-nested module always wins for assignment
+and querying:
+
+```ruby
+# Given possible_modules: [MyModule1, MyClass::MyModule1]
+# :MyModule1 resolves to the flat MyModule1 (not MyClass::MyModule1)
+
+MyARObject.create!(module_field: :MyModule1)   # sets to MyModule1
+MyARObject.where(module_field: :MyModule1)     # filters by MyModule1
+my_ar_object.module_field = :MyModule1         # assigns MyModule1
+
+# Use the underscored nested name for the nested module
+MyARObject.where(module_field: :my_class_my_module1)  # filters by MyClass::MyModule1
+```
+
+You can always refer to modules using their fully qualified names
+via symbols or module literals:
+
+```ruby
+MyARObject.create!(module_field: :MyModule1)
 MyARObject.create!(module_field: MyARObject::MyModule1)
 
+MyARObject.where(module_field: :MyModule1)
 MyARObject.where(module_field: MyARObject::MyModule1)
-
-my_ar_object.module_field = MyARObject::MyModule1
-
-my_ar_object.module_field #=> MyARObject::MyModule1:Module
-
-```
-But as typing fully qualified module names is not very ergonomic, you may also use symbols instead:
-
-```ruby
-MyARObject.create!(module_field: :MyClass)
-
-MyARObject.where(module_field: :MyClass)
-
-my_ar_object.module_field = :MyClass
-
-my_ar_object.module_field #=> MyARObject::MyClass:Class
-
 ```
 
-However, if there is the need for disambiguation, you can always use strings instead:
+And if there is the need for disambiguation, you can always use
+fully qualified strings:
 
 ```ruby
-
 MyARObject.create!(module_field: "MyClass::MyModule1")
 
 MyARObject.where(module_field: "MyClass::MyModule1")
 
 my_ar_object.module_field = "MyClass::MyModule1"
 
-my_ar_object.module_field #=> MyARObject::MyClass::MyModule::Module
+my_ar_object.module_field #=> MyARObject::MyClass::MyModule1
 ```
 
 ### Comparing modules with strings and symbols
@@ -178,7 +231,9 @@ module YourClassOrModuleThatWantsToCompare
   using ActiveModule::Comparison
 
   def method_that_compares
-    my_ar_object.module_field =~ :MyModule1
+    my_ar_object.module_field =~ :my_module1          # underscored name
+    my_ar_object.module_field =~ :my_class_my_module1 # nested underscored
+    my_ar_object.module_field =~ "MyClass::MyModule1" # fully qualified string
   end
 end
 ```
@@ -186,7 +241,7 @@ end
 or like this, if you don't want to use the refinement:
 
 ```ruby
-ActiveModule::Comparison.compare(my_ar_object.module_field, :MyModule1)
+ActiveModule::Comparison.compare(my_ar_object.module_field, :my_module1)
 ```
 
 but in this last case it would probably make more sense to simply use a module literal:
@@ -200,10 +255,11 @@ my_ar_object.module_field == MyClass::MyModule1
 
 ### Composition-based polymorphism (Strategy design pattern)
 
-[The Strategy design pattern](https://en.wikipedia.org/wiki/Strategy_pattern) allows composition based polymorphism. This enables runtime polymorphism (by changing the strategy in runtime), 
+[The Strategy design pattern](https://en.wikipedia.org/wiki/Strategy_pattern) allows composition based polymorphism. This enables runtime polymorphism (by changing the strategy in runtime),
 and multiple-polymorphism (by composing an object of multiple strategies).
 
-If you want to use classes this will do: 
+If you want to use classes this will do:
+
 ```ruby
 class MyARObject < ActiveRecord::Base
   attribute :strategy_class, :active_module, possible_modules: StrategySuperclass.subclasses
@@ -235,8 +291,8 @@ class MyARObject < ActiveRecord::Base
     end
   end
 
-  attribute :strategy, 
-            :active_module, 
+  attribute :strategy,
+            :active_module,
             possible_modules: [Strategy1, Strategy2]
 
   def run_strategy!(some_args)
@@ -244,8 +300,8 @@ class MyARObject < ActiveRecord::Base
   end
 end
 
-MyARObject.create!(module_field: :Strategy1).run_strategy! #=> "strategy1 called"
-MyARObject.create!(module_field: :Strategy2).run_strategy! #=> "strategy2 called"
+MyARObject.create!(strategy: :Strategy1).run_strategy! #=> "strategy1 called"
+MyARObject.create!(strategy: :Strategy2).run_strategy! #=> "strategy2 called"
 ```
 
 You can later easily promote these modules to classes if you need instance variables:
@@ -268,8 +324,8 @@ class MyARObject < ActiveRecord::Base
     end
   end
 
-  attribute :strategy, 
-            :active_module, 
+  attribute :strategy,
+            :active_module,
             possible_modules: [Strategy1, Strategy2]
 
   def run_strategy!(some_args)
@@ -277,17 +333,17 @@ class MyARObject < ActiveRecord::Base
   end
 end
 
-MyARObject.create!(module_field: :Strategy1).run_strategy! #=> "strategy1 called"
-MyARObject.create!(module_field: :Strategy2).run_strategy! #=> "strategy2 called"
+MyARObject.create!(strategy: :Strategy1).run_strategy! #=> "strategy1 called"
+MyARObject.create!(strategy: :Strategy2).run_strategy! #=> "strategy2 called"
 ```
 
 
 ### Rapid prototyping static domain objects
 
-```ruby 
+```ruby
 # Provider domain Object
 module Provider
- # As if the domain model class
+  # As if the domain model class
   def self.all
     [Ebay, Amazon]
   end
@@ -307,20 +363,21 @@ module Provider
 end
 
 class MyARObject < ActiveRecord::Base
-  attribute :provider, 
-            :active_module, 
+  attribute :provider,
+            :active_module,
             possible_modules: Provider.all
 end
 
-MyARObject.create!(provider: :Ebay).provier.do_something! 
+MyARObject.create!(provider: :Ebay).provider.do_something!
   #=> "do something with the ebay provider config"
-MyARObject.create!(provider: Provider::Amazon).provider.do_something! 
+MyARObject.create!(provider: Provider::Amazon).provider.do_something!
   #=> "do something with the amazon provider config"
 ```
 
 What is interesting about this is that we can later easily promote
-our provider objects into full fledged ActiveRecord objects without 
+our provider objects into full fledged ActiveRecord objects without
 big changes to our code:
+
 ```ruby
 class Provider < ActiveRecord::Base
   def do_something!
@@ -333,10 +390,10 @@ class MyARObject < ActiveRecord::Base
 end
 ```
 
-Just in case you'd like to have shared code amongst the instances in the above example, 
+Just in case you'd like to have shared code amongst the instances in the above example,
 this is how you could do so:
 
-```ruby 
+```ruby
 # Provider domain Object
 module Provider
   # As if the domain model class
@@ -344,7 +401,7 @@ module Provider
     [Ebay, Amazon]
   end
 
-  module Base 
+  module Base
     def do_something!
       "do something with #{something_from_an_instance}"
     end
@@ -375,24 +432,24 @@ end
 ### Static configuration management
 
 This example is not much different than previous one. It however stresses that the module we
-refer to might be used as a source of configuration parameters that change the behaviour of 
+refer to might be used as a source of configuration parameters that change the behaviour of
 the class it belongs to:
 
-```ruby 
+```ruby
 # Provider domain Object
 module ProviderConfig
   module Ebay
     module_function
 
-    def url= 'www.ebay.com'
-    def number_of_attempts= 5 
+    def url = "www.ebay.com"
+    def number_of_attempts = 5
   end
 
   module Amazon
     module_function
 
-    def url= 'www.amazon.com'
-    def number_of_attempts= 10
+    def url = "www.amazon.com"
+    def number_of_attempts = 10
   end
 
   def self.all
@@ -401,19 +458,19 @@ module ProviderConfig
 end
 
 class MyARObject < ActiveRecord::Base
-  attribute :provider_config, 
-            :active_module, 
+  attribute :provider_config,
+            :active_module,
             possible_modules: ProviderConfig.all
 
   def load_page!
     n_attempts = 0
     result = nil
-    while n_attempts < provider.number_of_attempts
-      result = get_page(provider.url)
-      if(result)
+    while n_attempts < provider_config.number_of_attempts
+      result = get_page(provider_config.url)
+      if result
         return result
       else
-        n_attempts.inc
+        n_attempts += 1
       end
     end
     result
@@ -423,12 +480,61 @@ end
 MyARObject.create!(provider_config: :Ebay).load_page!
 ```
 
-### Rich Java/C#-like enums
-This example is only to show the possibility. 
-This would probably benefit from using a meta programming abstraction and we will provide something
-like that in the future.
+### Rich Java/C#-like enums with `active_module_enum`
 
-Java/C# enums allow defining methods on the enum, which are shared across all enum values:
+Java/C# enums allow defining methods on the enum, which are shared across all enum values.
+ActiveModule supports this pattern with `active_module_enum`, which generates query, bang,
+and scope methods for your active_module attributes.
+
+Nested modules can always be referenced using underscored names at any level of nesting.
+For example, given a deeply nested module:
+
+```ruby
+module Lime
+  module Banana
+    module Strawberry; end
+  end
+end
+
+class MyARObject < ActiveRecord::Base
+  attribute :fruit,
+            :active_module,
+            possible_modules: [Lime::Banana::Strawberry]
+end
+```
+
+All of the following resolve to `Lime::Banana::Strawberry`:
+
+```ruby
+MyARObject.create!(fruit: :strawberry)              # last segment only
+MyARObject.create!(fruit: :banana_strawberry)       # last two segments
+MyARObject.create!(fruit: :lime_banana_strawberry)  # all segments
+```
+
+This also works for querying:
+
+```ruby
+MyARObject.where(fruit: :banana_strawberry)
+```
+
+And for comparison (with `ActiveModule::Comparison`):
+
+```ruby
+module MyModuleOrClass
+  using ActiveModule::Comparison
+
+  def self.match?(mod, value)
+    mod =~ value
+  end
+end
+
+MyModuleOrClass.match?(Lime::Banana::Strawberry, :banana_strawberry) #=> true
+```
+
+#### `active_module_enum` — generating query, bang, and scope methods
+
+The `active_module_enum` method generates Rails-enum-style convenience methods
+for your active_module attributes:
 
 ```ruby
 module PipelineStage
@@ -438,19 +544,9 @@ module PipelineStage
     [InitialContact, InNegotiations, LostDeal, PaidOut]
   end
 
-  def cast(stage)
-    self.all.map(&:external_provider_code).find{|code| code == stage} ||
-    self.all.map(&:database_representation).find{|code| code == stage} ||
-    self.all.map(&:frontend_representation).find{|code| code == stage} 
-  end
-
   module Base
     def external_provider_code
       @external_provider_code ||= self.name.underscore
-    end
-
-    def database_representation
-      self.name
     end
 
     def frontend_representation
@@ -458,35 +554,207 @@ module PipelineStage
     end
   end
 
-  module InitialContact
-    extend Base
-  end
-
-  module InNegotiations
-    extend Base
-  end
-
-  module LostDeal
-    extend Base
-  end
-
-  module PaidOut
-    extend Base
-  end
+  module InitialContact; extend Base; end
+  module InNegotiations; extend Base; end
+  module LostDeal; extend Base; end
+  module PaidOut; extend Base; end
 end
 
 class MyARObject < ActiveRecord::Base
-  attribute :pipeline_stage, 
-            :active_module, 
+  attribute :pipeline_stage,
+            :active_module,
             possible_modules: PipelineStage.all
-end
 
-object = MyARObject.new(pipeline_stage: :InitialStage)
-object.pipeline_stage&.frontend_representation #=> "INITIAL_STAGE"
-object.pipeline_stage = :InNegotiations
-object.pipeline_stage&.database_representation #=> "PipelineStage::InNegotiations"
+  active_module_enum :pipeline_stage
+end
 ```
 
+This generates:
+
+```ruby
+# Instance query methods (?)
+object = MyARObject.new(pipeline_stage: :initial_contact)
+object.initial_contact?                    #=> true
+object.lost_deal?                          #=> false
+
+# Instance bang methods (!) — set and save
+object.initial_contact!
+object.reload
+object.pipeline_stage #=> PipelineStage::InitialContact
+
+# Class-level scopes
+MyARObject.with_initial_contact            #=> ActiveRecord::Relation
+MyARObject.with_lost_deal                  #=> ActiveRecord::Relation
+
+# Class-level query methods (same as scopes)
+MyARObject.initial_contact                 #=> ActiveRecord::Relation
+```
+
+The pluralized attribute name method returns a hash mapping
+modules to their fully qualified names:
+
+```ruby
+MyARObject.pipeline_stages
+#=> { PipelineStage::InitialContact => "PipelineStage::InitialContact",
+#     PipelineStage::InNegotiations => "PipelineStage::InNegotiations",
+#     PipelineStage::LostDeal => "PipelineStage::LostDeal",
+#     PipelineStage::PaidOut => "PipelineStage::PaidOut" }
+
+MyARObject.pipeline_stages.keys   #=> [PipelineStage::InitialContact, ...]
+MyARObject.pipeline_stages.values #=> ["PipelineStage::InitialContact", ...]
+```
+
+All forms of underscored symbol names work for assignment and querying:
+
+```ruby
+MyARObject.create!(pipeline_stage: :initial_contact)
+MyARObject.create!(pipeline_stage: :in_negotiations)
+MyARObject.where(pipeline_stage: :lost_deal)
+MyARObject.where(pipeline_stage: :paid_out)
+```
+
+For nested modules, methods are generated at **all nesting levels**:
+
+```ruby
+module Lime
+  module Banana
+    module Strawberry; end
+  end
+end
+
+class Fruit < ActiveRecord::Base
+  attribute :kind, :active_module,
+            possible_modules: [Lime::Banana::Strawberry]
+  active_module_enum :kind
+end
+
+object = Fruit.new(kind: :strawberry)
+object.strawberry?                 #=> true
+object.banana_strawberry?          #=> true (partial nesting)
+object.lime_banana_strawberry?     #=> true (full nesting)
+
+Fruit.with_banana_strawberry       #=> ActiveRecord::Relation
+```
+
+The pluralized attribute name method also works with nested modules.
+Each module maps to its fully qualified name:
+
+```ruby
+module StatusA; end
+module StatusB; end
+module Nested
+  module StatusA; end
+  module StatusB; end
+end
+
+class Fruit < ActiveRecord::Base
+  attribute :kind, :active_module,
+            possible_modules: [StatusA, StatusB,
+                               Nested::StatusA, Nested::StatusB]
+  active_module_enum :kind
+end
+
+Fruit.kinds
+#=> { StatusA => "StatusA", StatusB => "StatusB",
+#     Nested::StatusA => "Nested::StatusA",
+#     Nested::StatusB => "Nested::StatusB" }
+```
+
+All underscored forms work for assignment and querying:
+
+```ruby
+Fruit.create!(kind: :strawberry)
+Fruit.create!(kind: :banana_strawberry)
+Fruit.create!(kind: :lime_banana_strawberry)
+Fruit.where(kind: :banana_strawberry)
+```
+
+##### Options
+
+`active_module_enum` accepts the following options:
+
+```ruby
+active_module_enum :pipeline_stage,
+                   prefix: true,       # prefix method names with the attribute name
+                   suffix: true,       # suffix method names with the attribute name
+                   scope: true,        # generate with_ scopes (default: true)
+                   instance_methods: true,  # generate ? and ! methods (default: true)
+                   on_ambiguous: :warn # :warn or :silence (default: :warn)
+```
+
+- **`prefix: true`** — prefixes methods with the attribute name:
+  `pipeline_stage_initial_contact?`, `with_pipeline_stage_initial_contact`
+- **`prefix: "custom"`** — prefixes with a custom string:
+  `custom_initial_contact?`, `with_custom_initial_contact`
+- **`suffix: true`** — suffixes methods with the attribute name:
+  `initial_contact_pipeline_stage?`, `with_initial_contact_pipeline_stage`
+- **`suffix: "custom"`** — suffixes with a custom string:
+  `initial_contact_custom?`, `with_initial_contact_custom`
+- **`scope: false`** — skips scope generation
+- **`instance_methods: false`** — skips `?` and `!` method generation
+- **`on_ambiguous: :silence`** — suppresses warnings when multiple
+  modules share the same demodulized name (e.g. `Tino` and
+  `Banana::Tino` both producing `tino?`)
+
+##### Ambiguity resolution
+
+When two modules at different nesting levels produce the same demodulized
+name (e.g. `Status` and `Nested::Status` both mapping to `status?`),
+**the least-nested module always wins** across all contexts —
+assignment, querying, scopes, and enum methods:
+
+```ruby
+module Status; end
+module Nested
+  module Status; end
+end
+
+class MyARObject < ActiveRecord::Base
+  attribute :status, :active_module,
+            possible_modules: [Status, Nested::Status]
+  active_module_enum :status
+end
+
+# Assignment resolves to the flat module
+object = MyARObject.new(status: :status)
+object.status         #=> Status (flat, not Nested::Status)
+
+# Querying resolves to the flat module
+MyARObject.where(status: :status)       # filters by Status
+MyARObject.find_by(status: "Status")    # finds Status
+
+# Enum query resolves to the flat module
+object.status?        #=> true (matches Status)
+object.nested_status? #=> true (use underscored name for Nested::Status)
+
+# Bang method resolves to the flat module
+object.status!
+object.reload
+object.status         #=> Status
+```
+
+To access the nested module, always use its underscored form:
+
+```ruby
+object.nested_status?         #=> true
+object.nested_status!         #=> sets to Nested::Status
+MyARObject.with_nested_status #=> ActiveRecord::Relation filtering by Nested::Status
+```
+
+This resolution applies consistently to `with_` scopes, class-level
+query methods, `find_by`/`where`, and assignment via symbol or string —
+the least-nested module wins for the ambiguous name:
+
+```ruby
+MyARObject.create!(status: Nested::Status)
+MyARObject.create!(status: Status)
+
+MyARObject.status.count             #=> 1 (flat Status only)
+MyARObject.with_nested_status.count #=> 1 (Nested::Status only)
+```
+
+Note: when both `prefix: true` and `suffix: true` are set, only `prefix` takes
+effect.
 
 ## Development
 
@@ -497,3 +765,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/pedrorolo/active_module.
+
+## License
+
+The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).

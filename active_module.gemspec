@@ -39,6 +39,7 @@ Gem::Specification.new do |spec|
 
   # Uncomment to register a new dependency of your gem
   spec.add_dependency "activemodel", "< 8.2", ">= 7.1"
+  spec.add_dependency "activesupport", "< 8.2", ">= 7.1"
   spec.add_dependency "zeitwerk", "~> 2.7"
   spec.add_development_dependency "bundler", ">= 1.15.0"
 

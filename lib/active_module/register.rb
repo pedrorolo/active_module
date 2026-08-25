@@ -12,6 +12,7 @@ module ActiveModule
 
       require "active_record"
       ActiveRecord::Type.register(type_symbol, ActiveModule::Base)
+      ActiveRecord::Base.extend(ActiveModule::Enum)
     end
   end
 end
