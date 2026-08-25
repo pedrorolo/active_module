@@ -1,4 +1,3 @@
-
 # active_module
 [![Gem Version](https://img.shields.io/gem/v/active_module)](https://rubygems.org/gems/active_module)
 [![License: MIT](https://img.shields.io/badge/license-MIT-brightgreen.svg)](https://opensource.org/licenses/MIT)
@@ -6,9 +5,7 @@
 [![100% Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)](https://github.com/pedrorolo/active_module/blob/main/spec/spec_helper.rb)
 [![Gem Total Downloads](https://img.shields.io/gem/dt/active_module?style=flat)](https://bestgems.org/gems/active_module)
 
-
-
-#### *Modules and Classes as first-class active record values!*
+*Modules and Classes as first-class active record values!*
 
 ActiveModel/ActiveRecord implementation of the Module attribute type.
 
@@ -23,40 +20,46 @@ This is a very generic mechanism that enables many possible utilizations, for in
 - **Static configuration management**
 - **Rich Java/C#-like enums**
 
-You can find examples of these in [Usage -> Examples](#Examples).
+You can find examples of these in [Usage -> Examples](#examples).
 
 ## TL;DR
 
 Declare module attributes like this:
+
 ```ruby
 class MyARObject < ActiveRecord::Base
-  attribute :module_field, 
-            :active_module, 
+  attribute :module_field,
+            :active_module,
             possible_modules: [MyModule1, MyClass, Nested::Module]
+
+  # Optional: adds Rails-enum-like helpers (my_module1?, my_module1!,
+  # with_my_module1, ...). Drop this line if you don't need them:
+  active_module_enum :module_field
 end
 ```
 
 Assign them like this:
-```ruby 
+
+```ruby
 object.module_field = Nested::Module
 object.module_field = :Module
 object.module_field = "Module"
 object.module_field = :nested_module          # underscored nested name
-object.module_field #=> Nested::Module:Module
+object.module_field                           #=> Nested::Module
 ```
 
 Query them like this:
-```ruby 
+
+```ruby
 MyARObject.where(module_field: Nested::Module)
 MyARObject.where(module_field: :Module)
 MyARObject.where(module_field: "Module")
 MyARObject.where(module_field: :nested_module) # underscored nested name
-object.module_field #=> Nested::Module:Module
 ```
 
 And compare them like this:
 
-```ruby 
+```ruby
 object.module_field == Nested::Module
 
 module MyNameSpace
@@ -73,7 +76,7 @@ end
 Add to your gemfile - and if you are using rails - that's all you need:
 
 ```ruby
-gem 'active_module', "~> 0.6"
+gem "active_module", "~> 0.8"
 ```
 
 If you are not using rails, just issue this command after loading active record
@@ -92,7 +95,8 @@ ActiveRecord::Type.register(:active_module, ActiveModule::Base)
 
 ## Usage
 
-Add a string field to the table you want to hold a module attribute in your migrations
+Add a string field to the table you want to hold a module attribute in your migrations:
+
 ```ruby
 create_table :my_ar_objects do |t|
   t.string :module_field, index: true
@@ -100,31 +104,36 @@ end
 ```
 
 Now given this random module hierarchy:
+
 ```ruby
 class MyARObject < ActiveRecord::Base
   module MyModule1; end
   module MyModule2; end
-  class MyClass; 
+
+  class MyClass
     module MyModule1; end
   end
 end
 ```
+
 You can make the field refer to one of these modules/classes like this:
+
 ```ruby
 class MyARObject < ActiveRecord::Base
-  attribute :module_field, 
-            :active_module, 
+  attribute :module_field,
+            :active_module,
             possible_modules: [MyModule1, MyModule2, MyClass, MyClass::MyModule1]
 end
 ```
 
 Optionally, you can specify how to map your modules into the database
 (the default is the module's fully qualified name):
+
 ```ruby
-attribute :module_field, 
-          :active_module, 
+attribute :module_field,
+          :active_module,
           possible_modules: [MyModule1, MyModule2, MyClass, MyClass::MyModule1],
-          mapping: {MyModule1 => "m1"}
+          mapping: { MyModule1 => "m1" }
 ```
 
 Modules not included in the mapping hash will use their fully qualified
@@ -133,19 +142,18 @@ with module literals, symbols, and strings:
 
 ```ruby
 my_ar_object.module_field = :MyModule1
-my_ar_object.module_field #=> MyARObject::MyModule1:Module
+my_ar_object.module_field #=> MyARObject::MyModule1
 
 MyARObject.where(module_field: :MyModule1)
 ```
 
 The mapping only affects what is stored in the database column.
 
-And this is it! Easy!<br>
+And this is it! Easy!
 
 ### Assigning and querying module attributes
+
 Now you can use this attribute in many handy ways!
-<br>
-<br>
 
 The most ergonomic way is to use underscored symbols. For flat modules,
 use the underscored name directly:
@@ -157,7 +165,7 @@ MyARObject.where(module_field: :my_module1)
 
 my_ar_object.module_field = :my_module1
 
-my_ar_object.module_field #=> MyARObject::MyModule1:Module
+my_ar_object.module_field #=> MyARObject::MyModule1
 ```
 
 Nested modules can be referenced using underscored symbols at any
@@ -169,7 +177,7 @@ MyARObject.create!(module_field: :my_module1)           # demodulized name
 MyARObject.where(module_field: :my_class_my_module1)    # all segments joined
 
 my_ar_object.module_field = :my_class_my_module1
-my_ar_object.module_field #=> MyARObject::MyClass::MyModule1:Module
+my_ar_object.module_field #=> MyARObject::MyClass::MyModule1
 ```
 
 When a demodulized name is ambiguous (shared by modules at different
@@ -209,7 +217,7 @@ MyARObject.where(module_field: "MyClass::MyModule1")
 
 my_ar_object.module_field = "MyClass::MyModule1"
 
-my_ar_object.module_field #=> MyARObject::MyClass::MyModule1:Module
+my_ar_object.module_field #=> MyARObject::MyClass::MyModule1
 ```
 
 ### Comparing modules with strings and symbols
@@ -247,10 +255,11 @@ my_ar_object.module_field == MyClass::MyModule1
 
 ### Composition-based polymorphism (Strategy design pattern)
 
-[The Strategy design pattern](https://en.wikipedia.org/wiki/Strategy_pattern) allows composition based polymorphism. This enables runtime polymorphism (by changing the strategy in runtime), 
+[The Strategy design pattern](https://en.wikipedia.org/wiki/Strategy_pattern) allows composition based polymorphism. This enables runtime polymorphism (by changing the strategy in runtime),
 and multiple-polymorphism (by composing an object of multiple strategies).
 
-If you want to use classes this will do: 
+If you want to use classes this will do:
+
 ```ruby
 class MyARObject < ActiveRecord::Base
   attribute :strategy_class, :active_module, possible_modules: StrategySuperclass.subclasses
@@ -282,8 +291,8 @@ class MyARObject < ActiveRecord::Base
     end
   end
 
-  attribute :strategy, 
-            :active_module, 
+  attribute :strategy,
+            :active_module,
             possible_modules: [Strategy1, Strategy2]
 
   def run_strategy!(some_args)
@@ -291,8 +300,8 @@ class MyARObject < ActiveRecord::Base
   end
 end
 
-MyARObject.create!(module_field: :Strategy1).run_strategy! #=> "strategy1 called"
-MyARObject.create!(module_field: :Strategy2).run_strategy! #=> "strategy2 called"
+MyARObject.create!(strategy: :Strategy1).run_strategy! #=> "strategy1 called"
+MyARObject.create!(strategy: :Strategy2).run_strategy! #=> "strategy2 called"
 ```
 
 You can later easily promote these modules to classes if you need instance variables:
@@ -315,8 +324,8 @@ class MyARObject < ActiveRecord::Base
     end
   end
 
-  attribute :strategy, 
-            :active_module, 
+  attribute :strategy,
+            :active_module,
             possible_modules: [Strategy1, Strategy2]
 
   def run_strategy!(some_args)
@@ -324,17 +333,17 @@ class MyARObject < ActiveRecord::Base
   end
 end
 
-MyARObject.create!(module_field: :Strategy1).run_strategy! #=> "strategy1 called"
-MyARObject.create!(module_field: :Strategy2).run_strategy! #=> "strategy2 called"
+MyARObject.create!(strategy: :Strategy1).run_strategy! #=> "strategy1 called"
+MyARObject.create!(strategy: :Strategy2).run_strategy! #=> "strategy2 called"
 ```
 
 
 ### Rapid prototyping static domain objects
 
-```ruby 
+```ruby
 # Provider domain Object
 module Provider
- # As if the domain model class
+  # As if the domain model class
   def self.all
     [Ebay, Amazon]
   end
@@ -354,20 +363,21 @@ module Provider
 end
 
 class MyARObject < ActiveRecord::Base
-  attribute :provider, 
-            :active_module, 
+  attribute :provider,
+            :active_module,
             possible_modules: Provider.all
 end
 
-MyARObject.create!(provider: :Ebay).provier.do_something! 
+MyARObject.create!(provider: :Ebay).provider.do_something!
   #=> "do something with the ebay provider config"
-MyARObject.create!(provider: Provider::Amazon).provider.do_something! 
+MyARObject.create!(provider: Provider::Amazon).provider.do_something!
   #=> "do something with the amazon provider config"
 ```
 
 What is interesting about this is that we can later easily promote
-our provider objects into full fledged ActiveRecord objects without 
+our provider objects into full fledged ActiveRecord objects without
 big changes to our code:
+
 ```ruby
 class Provider < ActiveRecord::Base
   def do_something!
@@ -380,10 +390,10 @@ class MyARObject < ActiveRecord::Base
 end
 ```
 
-Just in case you'd like to have shared code amongst the instances in the above example, 
+Just in case you'd like to have shared code amongst the instances in the above example,
 this is how you could do so:
 
-```ruby 
+```ruby
 # Provider domain Object
 module Provider
   # As if the domain model class
@@ -391,7 +401,7 @@ module Provider
     [Ebay, Amazon]
   end
 
-  module Base 
+  module Base
     def do_something!
       "do something with #{something_from_an_instance}"
     end
@@ -422,24 +432,24 @@ end
 ### Static configuration management
 
 This example is not much different than previous one. It however stresses that the module we
-refer to might be used as a source of configuration parameters that change the behaviour of 
+refer to might be used as a source of configuration parameters that change the behaviour of
 the class it belongs to:
 
-```ruby 
+```ruby
 # Provider domain Object
 module ProviderConfig
   module Ebay
     module_function
 
-    def url= 'www.ebay.com'
-    def number_of_attempts= 5 
+    def url = "www.ebay.com"
+    def number_of_attempts = 5
   end
 
   module Amazon
     module_function
 
-    def url= 'www.amazon.com'
-    def number_of_attempts= 10
+    def url = "www.amazon.com"
+    def number_of_attempts = 10
   end
 
   def self.all
@@ -448,19 +458,19 @@ module ProviderConfig
 end
 
 class MyARObject < ActiveRecord::Base
-  attribute :provider_config, 
-            :active_module, 
+  attribute :provider_config,
+            :active_module,
             possible_modules: ProviderConfig.all
 
   def load_page!
     n_attempts = 0
     result = nil
-    while n_attempts < provider.number_of_attempts
-      result = get_page(provider.url)
-      if(result)
+    while n_attempts < provider_config.number_of_attempts
+      result = get_page(provider_config.url)
+      if result
         return result
       else
-        n_attempts.inc
+        n_attempts += 1
       end
     end
     result
@@ -497,7 +507,7 @@ All of the following resolve to `Lime::Banana::Strawberry`:
 
 ```ruby
 MyARObject.create!(fruit: :strawberry)              # last segment only
-MyARObject.create!(fruit: :banana_strawberry)        # last two segments
+MyARObject.create!(fruit: :banana_strawberry)       # last two segments
 MyARObject.create!(fruit: :lime_banana_strawberry)  # all segments
 ```
 
@@ -580,13 +590,18 @@ MyARObject.with_lost_deal                  #=> ActiveRecord::Relation
 MyARObject.initial_contact                 #=> ActiveRecord::Relation
 ```
 
-The `pluralized attribute name` method returns a hash mapping
+The pluralized attribute name method returns a hash mapping
 modules to their fully qualified names:
 
 ```ruby
-MyARObject.statuses        #=> { MyModule1 => "MyModule1", MyModule2 => "MyModule2" }
-MyARObject.statuses.keys   #=> [MyModule1, MyModule2]
-MyARObject.statuses.values #=> ["MyModule1", "MyModule2"]
+MyARObject.pipeline_stages
+#=> { PipelineStage::InitialContact => "PipelineStage::InitialContact",
+#     PipelineStage::InNegotiations => "PipelineStage::InNegotiations",
+#     PipelineStage::LostDeal => "PipelineStage::LostDeal",
+#     PipelineStage::PaidOut => "PipelineStage::PaidOut" }
+
+MyARObject.pipeline_stages.keys   #=> [PipelineStage::InitialContact, ...]
+MyARObject.pipeline_stages.values #=> ["PipelineStage::InitialContact", ...]
 ```
 
 All forms of underscored symbol names work for assignment and querying:
@@ -616,13 +631,13 @@ end
 object = Fruit.new(kind: :strawberry)
 object.strawberry?                 #=> true
 object.banana_strawberry?          #=> true (partial nesting)
-object.lime_banana_strawberry?    #=> true (full nesting)
+object.lime_banana_strawberry?     #=> true (full nesting)
 
 Fruit.with_banana_strawberry       #=> ActiveRecord::Relation
 ```
 
-The `fields` method also works with nested modules. Each module gets
-the shortest unique underscored name as its key (least-nested wins):
+The pluralized attribute name method also works with nested modules.
+Each module maps to its fully qualified name:
 
 ```ruby
 module StatusA; end
@@ -656,8 +671,7 @@ Fruit.where(kind: :banana_strawberry)
 
 ##### Options
 
-`active_module_enum` accepts the same options as Rails' `enum` method
-(except for the values hash, which comes from `possible_modules`):
+`active_module_enum` accepts the following options:
 
 ```ruby
 active_module_enum :pipeline_stage,
@@ -735,13 +749,12 @@ the least-nested module wins for the ambiguous name:
 MyARObject.create!(status: Nested::Status)
 MyARObject.create!(status: Status)
 
-MyARObject.status.count          #=> 1 (flat Status only)
+MyARObject.status.count             #=> 1 (flat Status only)
 MyARObject.with_nested_status.count #=> 1 (Nested::Status only)
 ```
 
 Note: when both `prefix: true` and `suffix: true` are set, only `prefix` takes
-effect (matching Rails enum behavior).
-
+effect.
 
 ## Development
 
@@ -752,3 +765,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/pedrorolo/active_module.
+
+## License
+
+The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
