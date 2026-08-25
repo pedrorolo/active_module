@@ -50,7 +50,7 @@ module ActiveModule
 
     def define_enum_methods(attribute_name, modules, opts)
       sorted = modules
-               .sort_by { |m| -m.name.count("::") }
+               .sort_by { |m| m.name.count("::") }
       maps = build_name_maps(sorted)
       existing = {
         instance: instance_methods,

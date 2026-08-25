@@ -9,6 +9,7 @@ module ActiveModule
         name = enum_method_name(value_name, opts)
         return if existing[:singleton]
                   .include?(name.to_sym)
+        return if respond_to?(name)
 
         define_singleton_method(name) do
           where(attribute_name => mod)
@@ -22,6 +23,7 @@ module ActiveModule
         scope_name = :"with_#{name}"
         return if existing[:singleton]
                   .include?(scope_name)
+        return if respond_to?(scope_name)
 
         define_singleton_method(scope_name) do
           where(attribute_name => mod)
@@ -32,6 +34,7 @@ module ActiveModule
         fields = build_fields_map(modules)
         name = attribute_name.to_s.pluralize
         return if singleton_methods.include?(name.to_sym)
+        return if respond_to?(name)
 
         define_singleton_method(name) { fields }
       end

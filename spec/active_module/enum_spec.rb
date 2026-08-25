@@ -30,6 +30,12 @@ module ActiveRecordMethodNameCollision
   module All; end
 end
 
+module CoreMethodNameCollision
+  module Hash; end
+  module Class; end
+  module ObjectId; end
+end
+
 RSpec.describe ActiveModule::Enum do
   before do
     require "active_record"
@@ -463,6 +469,100 @@ RSpec.describe ActiveModule::Enum do
       expect(
         klass.with_nested_status_a_my_suffix.count
       ).to eq 1
+    end
+  end
+
+  describe "without overriding core Object methods" do
+    let(:klass) do
+      Class.new(ActiveRecord::Base) do
+        self.table_name = "enum_test_objects"
+        attribute :status,
+                  :active_module,
+                  possible_modules: [
+                    CoreMethodNameCollision::Hash,
+                    CoreMethodNameCollision::Class,
+                    CoreMethodNameCollision::ObjectId
+                  ]
+        active_module_enum :status
+      end
+    end
+
+    let(:plain_klass) do
+      Class.new(ActiveRecord::Base) do
+        self.table_name = "enum_test_objects"
+      end
+    end
+
+    it "keeps #object_id on instances intact",
+       :aggregate_failures do
+      obj = klass.new(status: CoreMethodNameCollision::Hash)
+      expect(obj.method(:object_id).unbind)
+        .to eq(plain_klass.instance_method(:object_id))
+      expect(obj.object_id).to eq(obj.__id__)
+    end
+
+    it "keeps #hash on instances intact",
+       :aggregate_failures do
+      obj = klass.new(status: CoreMethodNameCollision::Hash)
+      expect(obj.method(:hash).unbind)
+        .to eq(plain_klass.instance_method(:hash))
+      expect(obj.hash).to be_an(Integer)
+    end
+
+    it "keeps #class on instances intact",
+       :aggregate_failures do
+      obj = klass.new(status: CoreMethodNameCollision::Hash)
+      expect(obj.method(:class).unbind)
+        .to eq(plain_klass.instance_method(:class))
+      expect(obj.class).to eq klass
+    end
+
+    it "keeps #object_id on the class intact" do
+      expect(klass.method(:object_id).unbind)
+        .to eq(plain_klass.method(:object_id).unbind)
+    end
+
+    it "keeps #hash on the class intact",
+       :aggregate_failures do
+      expect(klass.method(:hash).unbind)
+        .to eq(plain_klass.method(:hash).unbind)
+      expect(klass.hash).to be_an(Integer)
+    end
+
+    it "keeps #class on the class intact",
+       :aggregate_failures do
+      expect(klass.method(:class).unbind)
+        .to eq(plain_klass.method(:class).unbind)
+      expect(klass.class).to eq Class
+    end
+
+    it "still defines collision-safe enum methods",
+       :aggregate_failures do
+      obj = klass.create!(status: CoreMethodNameCollision::Hash)
+      expect(obj.hash?).to be true
+      expect(obj.class?).to be false
+      expect(obj.object_id?).to be false
+      expect(klass.with_hash.count).to eq 1
+      expect(klass.statuses.keys)
+        .to include(CoreMethodNameCollision::Hash)
+    end
+
+    it "sets value via collision-safe bang method" do
+      obj = klass.create!(
+        status: CoreMethodNameCollision::ObjectId
+      )
+      obj.class!
+      expect(obj.reload.status)
+        .to eq CoreMethodNameCollision::Class
+    end
+
+    it "answers respond_to? for generated names",
+       :aggregate_failures do
+      obj = klass.new(status: CoreMethodNameCollision::Hash)
+      expect(obj.respond_to?(:hash?)).to be true
+      expect(obj.respond_to?(:hash!)).to be true
+      expect(klass.respond_to?(:with_hash)).to be true
+      expect(klass.respond_to?(:statuses)).to be true
     end
   end
 

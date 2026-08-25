@@ -30,6 +30,7 @@ module ActiveModule
 
       def define_if_new(existing, name, &block)
         return if existing.include?(name)
+        return if new.respond_to?(name)
 
         define_method(name, &block)
       end
