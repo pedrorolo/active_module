@@ -76,7 +76,7 @@ end
 Add to your gemfile - and if you are using rails - that's all you need:
 
 ```ruby
-gem "active_module", "~> 0.8"
+gem "active_module", "~> 0.9"
 ```
 
 If you are not using rails, just issue this command after loading active record
