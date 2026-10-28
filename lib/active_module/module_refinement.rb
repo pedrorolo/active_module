@@ -27,12 +27,8 @@ module ActiveModule
 
       def colon_delimited_names
         name_parts = name.split("::")
-        [qualified_name].tap do |names|
-          loop do
-            names << name_parts.join("::").freeze
-            name_parts = name_parts.drop(1)
-            break if name_parts.empty?
-          end
+        [qualified_name] + name_parts.each_index.map do |index|
+          name_parts.drop(index).join("::").freeze
         end
       end
     end
