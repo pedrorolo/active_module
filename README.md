@@ -695,6 +695,8 @@ active_module_enum :pipeline_stage,
 - **`on_ambiguous: :silence`** — suppresses warnings when multiple
   modules share the same demodulized name (e.g. `Tino` and
   `Banana::Tino` both producing `tino?`)
+- **`on_ambiguous: :warn`** — logs the warning with `Rails.logger.warn` when
+  an ambiguous demodulized name is used (default behavior).
 
 ##### Ambiguity resolution
 

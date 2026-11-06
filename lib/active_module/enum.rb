@@ -67,7 +67,7 @@ module ActiveModule
     def generate_methods(attribute_name, mod, opts,
                          maps, existing)
       mod.underscored_names.each do |value_name|
-        warn_if_ambiguous(mod, value_name, opts, maps)
+        warn_if_ambiguous(value_name, opts, maps)
         if opts[:instance_methods]
           define_instance_methods(
             attribute_name, mod, value_name,

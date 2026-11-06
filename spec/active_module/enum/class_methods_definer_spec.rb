@@ -40,7 +40,7 @@ RSpec.describe ActiveModule::Enum::ClassMethodsDefiner do
                   EnumTestModules::Nested::StatusA,
                   EnumTestModules::Nested::StatusB
                 ]
-      active_module_enum :status
+      active_module_enum :status, on_ambiguous: :silence
     end
   end
 
@@ -295,7 +295,9 @@ RSpec.describe ActiveModule::Enum::ClassMethodsDefiner do
                     EnumTestModules::StatusA,
                     EnumTestModules::Nested::StatusA
                   ]
-        active_module_enum :status, scope: false
+        active_module_enum :status,
+                           scope: false,
+                           on_ambiguous: :silence
       end
     end
 

@@ -124,7 +124,9 @@ RSpec.describe ActiveModule::Enum do
                     EnumTestModules::Nested::StatusA,
                     EnumTestModules::Nested::StatusB
                   ]
-        active_module_enum :status, prefix: true
+        active_module_enum :status,
+                           prefix: true,
+                           on_ambiguous: :silence
       end
     end
 
@@ -225,7 +227,6 @@ RSpec.describe ActiveModule::Enum do
     end
 
     it "filters by suffixed class-level query method" do
-      expect { klass }.not_to output.to_stderr
       klass.create!(status: EnumTestModules::StatusA)
       expect(klass.status_a_status.count).to eq 1
     end
@@ -243,7 +244,9 @@ RSpec.describe ActiveModule::Enum do
                     EnumTestModules::Nested::StatusA,
                     EnumTestModules::Nested::StatusB
                   ]
-        active_module_enum :status, suffix: true
+        active_module_enum :status,
+                           suffix: true,
+                           on_ambiguous: :silence
       end
     end
 

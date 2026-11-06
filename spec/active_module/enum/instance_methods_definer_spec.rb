@@ -40,7 +40,7 @@ RSpec.describe ActiveModule::Enum::InstanceMethodsDefiner do
                   EnumTestModules::Nested::StatusA,
                   EnumTestModules::Nested::StatusB
                 ]
-      active_module_enum :status
+      active_module_enum :status, on_ambiguous: :silence
     end
   end
 

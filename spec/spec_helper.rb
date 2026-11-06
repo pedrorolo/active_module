@@ -4,8 +4,18 @@ require "simplecov"
 SimpleCov.minimum_coverage 100
 SimpleCov.start
 require "active_record"
+require "active_support/logger"
 require "active_module"
 require "byebug"
+
+unless defined?(Rails)
+  module Rails
+    class << self
+      attr_accessor :logger
+    end
+  end
+end
+Rails.logger ||= ActiveSupport::Logger.new($stderr)
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure

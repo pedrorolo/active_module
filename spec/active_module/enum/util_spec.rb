@@ -105,6 +105,14 @@ RSpec.describe ActiveModule::Enum::Util do
   end
 
   describe "#warn_if_ambiguous" do
+    def with_rails_logger
+      logger = instance_spy(Logger)
+      rails = Module.new
+      allow(rails).to receive(:logger).and_return(logger)
+      stub_const("Rails", rails)
+      yield logger
+    end
+
     def define_ambiguous(**opts)
       modules = [
         AmbiguousModules::Tino,
@@ -120,42 +128,57 @@ RSpec.describe ActiveModule::Enum::Util do
       end
     end
 
+    def define_unambiguous
+      Class.new(ActiveRecord::Base) do
+        self.table_name = "enum_test_objects"
+        attribute :status,
+                  :active_module,
+                  possible_modules: [
+                    EnumTestModules::StatusA,
+                    EnumTestModules::StatusB
+                  ]
+        active_module_enum :status, suffix: true
+      end
+    end
+
+    def expected_prefixed_warning
+      "WARNING: `status_tino` is ambiguous. " \
+        "Use `status_ambiguous_modules_tino`, " \
+        "`status_banana_tino`, " \
+        "`status_ambiguous_modules_banana_tino` for " \
+        "unambiguous access. " \
+        "Pass on_ambiguous: :silence " \
+        "to suppress this warning."
+    end
+
     it "warns when name is ambiguous" do
-      expect { define_ambiguous }
-        .to output(/WARNING: `tino` is ambiguous/)
-        .to_stderr
+      with_rails_logger do |logger|
+        define_ambiguous
+        expect(logger).to have_received(:warn)
+          .with(/WARNING: `tino` is ambiguous/)
+      end
     end
 
     it "warns once with all prefixed unambiguous alternatives" do
-      warning = "WARNING: `status_tino` is ambiguous. " \
-                "Use `status_ambiguous_modules_tino`, " \
-                "`status_banana_tino`, " \
-                "`status_ambiguous_modules_banana_tino` for " \
-                "unambiguous access. " \
-                "Pass on_ambiguous: :silence " \
-                "to suppress this warning.\n"
-      expect { define_ambiguous(prefix: true) }
-        .to output(warning).to_stderr
+      with_rails_logger do |logger|
+        define_ambiguous(prefix: true)
+        expect(logger).to have_received(:warn)
+          .with(expected_prefixed_warning).once
+      end
     end
 
     it "does not warn when module names are unambiguous" do
-      expect do
-        Class.new(ActiveRecord::Base) do
-          self.table_name = "enum_test_objects"
-          attribute :status,
-                    :active_module,
-                    possible_modules: [
-                      EnumTestModules::StatusA,
-                      EnumTestModules::StatusB
-                    ]
-          active_module_enum :status, suffix: true
-        end
-      end.not_to output.to_stderr
+      with_rails_logger do |logger|
+        define_unambiguous
+        expect(logger).not_to have_received(:warn)
+      end
     end
 
     it "does not warn when on_ambiguous: :silence" do
-      expect { define_ambiguous(on_ambiguous: :silence) }
-        .not_to output.to_stderr
+      with_rails_logger do |logger|
+        define_ambiguous(on_ambiguous: :silence)
+        expect(logger).not_to have_received(:warn)
+      end
     end
   end
 

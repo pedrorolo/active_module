@@ -35,22 +35,32 @@ module ActiveModule
         define_method(name, &block)
       end
 
-      def warn_if_ambiguous(mod, value_name, opts, maps)
+      def warn_if_ambiguous(value_name, opts, maps)
+        return unless should_warn_for_ambiguity?(value_name, opts, maps)
+
+        Rails.logger.warn(ambiguity_warning_message(value_name, opts, maps))
+      end
+
+      def should_warn_for_ambiguity?(value_name, opts, maps)
         ambiguous_modules = maps[:ambiguity][value_name]
         return unless ambiguous_modules&.size&.> 1
         return if opts[:on_ambiguous] == :silence
-        return unless maps[:warned].add?(value_name)
 
+        maps[:warned].add?(value_name)
+      end
+
+      def ambiguity_warning_message(value_name, opts, maps)
+        ambiguous_modules = maps[:ambiguity][value_name]
         name = enum_method_name(value_name, opts)
         alts = ambiguous_modules
                .flat_map { |ambiguous_mod| maps[:unique][ambiguous_mod] || [] }
                .uniq
-               .map { |alternative| "`#{enum_method_name(alternative, opts)}`" }
-        warn("WARNING: `#{name}` is ambiguous. " \
-             "Use #{alts.join(", ")} for " \
-             "unambiguous access. " \
-             "Pass on_ambiguous: :silence " \
-             "to suppress this warning.")
+               .map { |alternative| enum_method_name(alternative, opts) }
+        "WARNING: `#{name}` is ambiguous. " \
+          "Use #{alts.map { |alt| "`#{alt}`" }.join(", ")} for " \
+          "unambiguous access. " \
+          "Pass on_ambiguous: :silence " \
+          "to suppress this warning."
       end
 
       def build_name_maps(modules)
