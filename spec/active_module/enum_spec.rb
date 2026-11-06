@@ -225,6 +225,7 @@ RSpec.describe ActiveModule::Enum do
     end
 
     it "filters by suffixed class-level query method" do
+      expect { klass }.not_to output.to_stderr
       klass.create!(status: EnumTestModules::StatusA)
       expect(klass.status_a_status.count).to eq 1
     end

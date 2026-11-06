@@ -52,6 +52,7 @@ module ActiveModule
       sorted = modules
                .sort_by { |m| m.name.count("::") }
       maps = build_name_maps(sorted)
+      maps[:warned] = Set.new
       existing = {
         instance: instance_methods,
         singleton: singleton_methods

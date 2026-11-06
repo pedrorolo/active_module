@@ -126,6 +126,33 @@ RSpec.describe ActiveModule::Enum::Util do
         .to_stderr
     end
 
+    it "warns once with all prefixed unambiguous alternatives" do
+      warning = "WARNING: `status_tino` is ambiguous. " \
+                "Use `status_ambiguous_modules_tino`, " \
+                "`status_banana_tino`, " \
+                "`status_ambiguous_modules_banana_tino` for " \
+                "unambiguous access. " \
+                "Pass on_ambiguous: :silence " \
+                "to suppress this warning.\n"
+      expect { define_ambiguous(prefix: true) }
+        .to output(warning).to_stderr
+    end
+
+    it "does not warn when module names are unambiguous" do
+      expect do
+        Class.new(ActiveRecord::Base) do
+          self.table_name = "enum_test_objects"
+          attribute :status,
+                    :active_module,
+                    possible_modules: [
+                      EnumTestModules::StatusA,
+                      EnumTestModules::StatusB
+                    ]
+          active_module_enum :status, suffix: true
+        end
+      end.not_to output.to_stderr
+    end
+
     it "does not warn when on_ambiguous: :silence" do
       expect { define_ambiguous(on_ambiguous: :silence) }
         .not_to output.to_stderr

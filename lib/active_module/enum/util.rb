@@ -36,12 +36,16 @@ module ActiveModule
       end
 
       def warn_if_ambiguous(mod, value_name, opts, maps)
-        return unless maps[:ambiguity][value_name]&.size&.> 1
+        ambiguous_modules = maps[:ambiguity][value_name]
+        return unless ambiguous_modules&.size&.> 1
         return if opts[:on_ambiguous] == :silence
+        return unless maps[:warned].add?(value_name)
 
         name = enum_method_name(value_name, opts)
-        alts = (maps[:unique][mod] || [])
-               .map { |a| "`#{a}`" }
+        alts = ambiguous_modules
+               .flat_map { |ambiguous_mod| maps[:unique][ambiguous_mod] || [] }
+               .uniq
+               .map { |alternative| "`#{enum_method_name(alternative, opts)}`" }
         warn("WARNING: `#{name}` is ambiguous. " \
              "Use #{alts.join(", ")} for " \
              "unambiguous access. " \
