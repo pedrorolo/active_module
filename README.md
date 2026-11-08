@@ -44,7 +44,8 @@ Assign them like this:
 object.module_field = Nested::Module
 object.module_field = :Module
 object.module_field = "Module"
-object.module_field = :nested_module          # underscored nested name
+object.module_field = :nested_module
+object.module_field = :module
 object.module_field                           #=> Nested::Module
 ```
 
@@ -54,7 +55,8 @@ Query them like this:
 MyARObject.where(module_field: Nested::Module)
 MyARObject.where(module_field: :Module)
 MyARObject.where(module_field: "Module")
-MyARObject.where(module_field: :nested_module) # underscored nested name
+MyARObject.where(module_field: :nested_module)
+MyARObject.where(module_field: :module)
 ```
 
 And compare them like this:
@@ -67,7 +69,9 @@ module MyNameSpace
 
   object.module_field =~ :Module
   object.module_field =~ "Module"
-  object.module_field =~ :nested_module     # underscored nested name
+  object.module_field =~ :nested_module
+  object.module_field =~ :module
+  
 end
 ```
 
@@ -159,10 +163,13 @@ The most ergonomic way is to use underscored symbols. For flat modules,
 use the underscored name directly:
 
 ```ruby
+MyARObject.create!(module_field: MyARObject::MyModule1)
 MyARObject.create!(module_field: :my_module1)
 
+MyARObject.where(module_field: MyARObject::MyModule1)
 MyARObject.where(module_field: :my_module1)
 
+my_ar_object.module_field = MyARObject::MyModule1
 my_ar_object.module_field = :my_module1
 
 my_ar_object.module_field #=> MyARObject::MyModule1
@@ -172,10 +179,13 @@ Nested modules can be referenced using underscored symbols at any
 nesting level:
 
 ```ruby
+MyARObject.create!(module_field: MyARObject::MyClass::MyModule1)
 MyARObject.create!(module_field: :my_class_my_module1)  # partial nesting
-MyARObject.create!(module_field: :my_module1)           # demodulized name
+MyARObject.create!(module_field: :my_module1)
+MyARObject.where(module_field: MyARObject::MyClass::MyModule1)
 MyARObject.where(module_field: :my_class_my_module1)    # all segments joined
 
+my_ar_object.module_field = MyARObject::MyClass::MyModule1
 my_ar_object.module_field = :my_class_my_module1
 my_ar_object.module_field #=> MyARObject::MyClass::MyModule1
 ```
@@ -188,11 +198,15 @@ and querying:
 # Given possible_modules: [MyModule1, MyClass::MyModule1]
 # :MyModule1 resolves to the flat MyModule1 (not MyClass::MyModule1)
 
+MyARObject.create!(module_field: MyARObject::MyModule1)
 MyARObject.create!(module_field: :MyModule1)   # sets to MyModule1
+MyARObject.where(module_field: MyARObject::MyModule1) # filters by MyModule1
 MyARObject.where(module_field: :MyModule1)     # filters by MyModule1
+my_ar_object.module_field = MyARObject::MyModule1
 my_ar_object.module_field = :MyModule1         # assigns MyModule1
 
 # Use the underscored nested name for the nested module
+MyARObject.where(module_field: MyARObject::MyClass::MyModule1)
 MyARObject.where(module_field: :my_class_my_module1)  # filters by MyClass::MyModule1
 ```
 
@@ -200,21 +214,24 @@ You can always refer to modules using their fully qualified names
 via symbols or module literals:
 
 ```ruby
-MyARObject.create!(module_field: :MyModule1)
 MyARObject.create!(module_field: MyARObject::MyModule1)
+MyARObject.create!(module_field: :MyModule1)
 
-MyARObject.where(module_field: :MyModule1)
 MyARObject.where(module_field: MyARObject::MyModule1)
+MyARObject.where(module_field: :MyModule1)
 ```
 
 And if there is the need for disambiguation, you can always use
 fully qualified strings:
 
 ```ruby
+MyARObject.create!(module_field: MyARObject::MyClass::MyModule1)
 MyARObject.create!(module_field: "MyClass::MyModule1")
 
+MyARObject.where(module_field: MyARObject::MyClass::MyModule1)
 MyARObject.where(module_field: "MyClass::MyModule1")
 
+my_ar_object.module_field = MyARObject::MyClass::MyModule1
 my_ar_object.module_field = "MyClass::MyModule1"
 
 my_ar_object.module_field #=> MyARObject::MyClass::MyModule1
@@ -231,6 +248,8 @@ module YourClassOrModuleThatWantsToCompare
   using ActiveModule::Comparison
 
   def method_that_compares
+    my_ar_object.module_field == MyARObject::MyModule1
+    my_ar_object.module_field =~ MyARObject::MyModule1
     my_ar_object.module_field =~ :my_module1          # underscored name
     my_ar_object.module_field =~ :my_class_my_module1 # nested underscored
     my_ar_object.module_field =~ "MyClass::MyModule1" # fully qualified string
@@ -241,13 +260,16 @@ end
 or like this, if you don't want to use the refinement:
 
 ```ruby
+ActiveModule::Comparison.compare(
+  my_ar_object.module_field, MyARObject::MyClass::MyModule1
+)
 ActiveModule::Comparison.compare(my_ar_object.module_field, :my_module1)
 ```
 
 but in this last case it would probably make more sense to simply use a module literal:
 
 ```ruby
-my_ar_object.module_field == MyClass::MyModule1
+my_ar_object.module_field == MyARObject::MyClass::MyModule1
 ```
 
 
@@ -300,8 +322,10 @@ class MyARObject < ActiveRecord::Base
   end
 end
 
-MyARObject.create!(strategy: :Strategy1).run_strategy! #=> "strategy1 called"
-MyARObject.create!(strategy: :Strategy2).run_strategy! #=> "strategy2 called"
+MyARObject.create!(strategy: MyARObject::Strategy1).run_strategy! #=> "strategy1 called"
+MyARObject.create!(strategy: :Strategy1).run_strategy!             #=> "strategy1 called"
+MyARObject.create!(strategy: MyARObject::Strategy2).run_strategy! #=> "strategy2 called"
+MyARObject.create!(strategy: :Strategy2).run_strategy!             #=> "strategy2 called"
 ```
 
 You can later easily promote these modules to classes if you need instance variables:
@@ -333,8 +357,10 @@ class MyARObject < ActiveRecord::Base
   end
 end
 
-MyARObject.create!(strategy: :Strategy1).run_strategy! #=> "strategy1 called"
-MyARObject.create!(strategy: :Strategy2).run_strategy! #=> "strategy2 called"
+MyARObject.create!(strategy: MyARObject::Strategy1).run_strategy! #=> "strategy1 called"
+MyARObject.create!(strategy: :Strategy1).run_strategy!             #=> "strategy1 called"
+MyARObject.create!(strategy: MyARObject::Strategy2).run_strategy! #=> "strategy2 called"
+MyARObject.create!(strategy: :Strategy2).run_strategy!             #=> "strategy2 called"
 ```
 
 
@@ -368,9 +394,13 @@ class MyARObject < ActiveRecord::Base
             possible_modules: Provider.all
 end
 
+MyARObject.create!(provider: Provider::Ebay).provider.do_something!
+  #=> "do something with the ebay provider config"
 MyARObject.create!(provider: :Ebay).provider.do_something!
   #=> "do something with the ebay provider config"
 MyARObject.create!(provider: Provider::Amazon).provider.do_something!
+  #=> "do something with the amazon provider config"
+MyARObject.create!(provider: :Amazon).provider.do_something!
   #=> "do something with the amazon provider config"
 ```
 
@@ -477,6 +507,7 @@ class MyARObject < ActiveRecord::Base
   end
 end
 
+MyARObject.create!(provider_config: ProviderConfig::Ebay).load_page!
 MyARObject.create!(provider_config: :Ebay).load_page!
 ```
 
@@ -490,31 +521,33 @@ Nested modules can always be referenced using underscored names at any level of 
 For example, given a deeply nested module:
 
 ```ruby
-module Lime
-  module Banana
-    module Strawberry; end
+module Workflow
+  module Pipeline
+    module InitialContact; end
   end
 end
 
 class MyARObject < ActiveRecord::Base
-  attribute :fruit,
+  attribute :pipeline_stage,
             :active_module,
-            possible_modules: [Lime::Banana::Strawberry]
+            possible_modules: [Workflow::Pipeline::InitialContact]
 end
 ```
 
-All of the following resolve to `Lime::Banana::Strawberry`:
+All of the following resolve to `Workflow::Pipeline::InitialContact`:
 
 ```ruby
-MyARObject.create!(fruit: :strawberry)              # last segment only
-MyARObject.create!(fruit: :banana_strawberry)       # last two segments
-MyARObject.create!(fruit: :lime_banana_strawberry)  # all segments
+MyARObject.create!(pipeline_stage: Workflow::Pipeline::InitialContact)
+MyARObject.create!(pipeline_stage: :initial_contact) # last segment only
+MyARObject.create!(pipeline_stage: :pipeline_initial_contact) # last two segments
+MyARObject.create!(pipeline_stage: :workflow_pipeline_initial_contact) # all segments
 ```
 
 This also works for querying:
 
 ```ruby
-MyARObject.where(fruit: :banana_strawberry)
+MyARObject.where(pipeline_stage: Workflow::Pipeline::InitialContact)
+MyARObject.where(pipeline_stage: :pipeline_initial_contact)
 ```
 
 And for comparison (with `ActiveModule::Comparison`):
@@ -528,7 +561,13 @@ module MyModuleOrClass
   end
 end
 
-MyModuleOrClass.match?(Lime::Banana::Strawberry, :banana_strawberry) #=> true
+MyModuleOrClass.match?(
+  Workflow::Pipeline::InitialContact,
+  Workflow::Pipeline::InitialContact
+) #=> true
+MyModuleOrClass.match?(
+  Workflow::Pipeline::InitialContact, :pipeline_initial_contact
+) #=> true
 ```
 
 #### `active_module_enum` — generating query, bang, and scope methods
@@ -573,6 +612,7 @@ This generates:
 
 ```ruby
 # Instance query methods (?)
+object = MyARObject.new(pipeline_stage: PipelineStage::InitialContact)
 object = MyARObject.new(pipeline_stage: :initial_contact)
 object.initial_contact?                    #=> true
 object.lost_deal?                          #=> false
@@ -607,6 +647,7 @@ MyARObject.pipeline_stages.values #=> ["PipelineStage::InitialContact", ...]
 All forms of underscored symbol names work for assignment and querying:
 
 ```ruby
+MyARObject.create!(pipeline_stage: PipelineStage::InitialContact)
 MyARObject.create!(pipeline_stage: :initial_contact)
 MyARObject.create!(pipeline_stage: :in_negotiations)
 MyARObject.where(pipeline_stage: :lost_deal)
@@ -616,24 +657,27 @@ MyARObject.where(pipeline_stage: :paid_out)
 For nested modules, methods are generated at **all nesting levels**:
 
 ```ruby
-module Lime
-  module Banana
-    module Strawberry; end
+module Workflow
+  module Pipeline
+    module InitialContact; end
   end
 end
 
-class Fruit < ActiveRecord::Base
-  attribute :kind, :active_module,
-            possible_modules: [Lime::Banana::Strawberry]
-  active_module_enum :kind
+class PipelineEvent < ActiveRecord::Base
+  attribute :pipeline_stage, :active_module,
+            possible_modules: [Workflow::Pipeline::InitialContact]
+  active_module_enum :pipeline_stage
 end
 
-object = Fruit.new(kind: :strawberry)
-object.strawberry?                 #=> true
-object.banana_strawberry?          #=> true (partial nesting)
-object.lime_banana_strawberry?     #=> true (full nesting)
+object = PipelineEvent.new(
+  pipeline_stage: Workflow::Pipeline::InitialContact
+)
+object = PipelineEvent.new(pipeline_stage: :initial_contact)
+object.initial_contact?                  #=> true
+object.pipeline_initial_contact?         #=> true (partial nesting)
+object.workflow_pipeline_initial_contact? #=> true (full nesting)
 
-Fruit.with_banana_strawberry       #=> ActiveRecord::Relation
+PipelineEvent.with_pipeline_initial_contact #=> ActiveRecord::Relation
 ```
 
 The pluralized attribute name method also works with nested modules.
@@ -647,14 +691,14 @@ module Nested
   module StatusB; end
 end
 
-class Fruit < ActiveRecord::Base
-  attribute :kind, :active_module,
+class PipelineRecord < ActiveRecord::Base
+  attribute :stage, :active_module,
             possible_modules: [StatusA, StatusB,
                                Nested::StatusA, Nested::StatusB]
-  active_module_enum :kind
+  active_module_enum :stage
 end
 
-Fruit.kinds
+PipelineRecord.stages
 #=> { StatusA => "StatusA", StatusB => "StatusB",
 #     Nested::StatusA => "Nested::StatusA",
 #     Nested::StatusB => "Nested::StatusB" }
@@ -663,10 +707,14 @@ Fruit.kinds
 All underscored forms work for assignment and querying:
 
 ```ruby
-Fruit.create!(kind: :strawberry)
-Fruit.create!(kind: :banana_strawberry)
-Fruit.create!(kind: :lime_banana_strawberry)
-Fruit.where(kind: :banana_strawberry)
+PipelineEvent.create!(
+  pipeline_stage: Workflow::Pipeline::InitialContact
+)
+PipelineEvent.create!(pipeline_stage: :initial_contact)
+PipelineEvent.create!(pipeline_stage: :pipeline_initial_contact)
+PipelineEvent.create!(pipeline_stage: :workflow_pipeline_initial_contact)
+PipelineEvent.where(pipeline_stage: Workflow::Pipeline::InitialContact)
+PipelineEvent.where(pipeline_stage: :pipeline_initial_contact)
 ```
 
 ##### Options
@@ -718,6 +766,7 @@ class MyARObject < ActiveRecord::Base
 end
 
 # Assignment resolves to the flat module
+object = MyARObject.new(status: Status)
 object = MyARObject.new(status: :status)
 object.status         #=> Status (flat, not Nested::Status)
 
