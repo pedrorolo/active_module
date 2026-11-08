@@ -145,9 +145,11 @@ name as the database representation. Assignment and querying still work
 with module literals, symbols, and strings:
 
 ```ruby
+my_ar_object.module_field = MyARObject::MyModule1
 my_ar_object.module_field = :MyModule1
 my_ar_object.module_field #=> MyARObject::MyModule1
 
+MyARObject.where(module_field: MyARObject::MyModule1)
 MyARObject.where(module_field: :MyModule1)
 ```
 
@@ -248,11 +250,10 @@ module YourClassOrModuleThatWantsToCompare
   using ActiveModule::Comparison
 
   def method_that_compares
-    my_ar_object.module_field == MyARObject::MyModule1
-    my_ar_object.module_field =~ MyARObject::MyModule1
-    my_ar_object.module_field =~ :my_module1          # underscored name
-    my_ar_object.module_field =~ :my_class_my_module1 # nested underscored
-    my_ar_object.module_field =~ "MyClass::MyModule1" # fully qualified string
+    my_ar_object.module_field =~ MyARObject::MyModule1 # module literal
+    my_ar_object.module_field =~ :my_module1           # underscored name
+    my_ar_object.module_field =~ :my_class_my_module1  # nested underscored
+    my_ar_object.module_field =~ "MyClass::MyModule1"  # fully qualified string
   end
 end
 ```
@@ -323,9 +324,9 @@ class MyARObject < ActiveRecord::Base
 end
 
 MyARObject.create!(strategy: MyARObject::Strategy1).run_strategy! #=> "strategy1 called"
-MyARObject.create!(strategy: :Strategy1).run_strategy!             #=> "strategy1 called"
+MyARObject.create!(strategy: :Strategy1).run_strategy!            #=> "strategy1 called"
 MyARObject.create!(strategy: MyARObject::Strategy2).run_strategy! #=> "strategy2 called"
-MyARObject.create!(strategy: :Strategy2).run_strategy!             #=> "strategy2 called"
+MyARObject.create!(strategy: :Strategy2).run_strategy!            #=> "strategy2 called"
 ```
 
 You can later easily promote these modules to classes if you need instance variables:
@@ -358,9 +359,9 @@ class MyARObject < ActiveRecord::Base
 end
 
 MyARObject.create!(strategy: MyARObject::Strategy1).run_strategy! #=> "strategy1 called"
-MyARObject.create!(strategy: :Strategy1).run_strategy!             #=> "strategy1 called"
+MyARObject.create!(strategy: :Strategy1).run_strategy!            #=> "strategy1 called"
 MyARObject.create!(strategy: MyARObject::Strategy2).run_strategy! #=> "strategy2 called"
-MyARObject.create!(strategy: :Strategy2).run_strategy!             #=> "strategy2 called"
+MyARObject.create!(strategy: :Strategy2).run_strategy!            #=> "strategy2 called"
 ```
 
 
@@ -508,6 +509,7 @@ class MyARObject < ActiveRecord::Base
 end
 
 MyARObject.create!(provider_config: ProviderConfig::Ebay).load_page!
+# Symbols and strings work as well:
 MyARObject.create!(provider_config: :Ebay).load_page!
 ```
 
@@ -672,9 +674,8 @@ end
 object = PipelineEvent.new(
   pipeline_stage: Workflow::Pipeline::InitialContact
 )
-object = PipelineEvent.new(pipeline_stage: :initial_contact)
-object.initial_contact?                  #=> true
-object.pipeline_initial_contact?         #=> true (partial nesting)
+object.initial_contact?                   #=> true
+object.pipeline_initial_contact?          #=> true (partial nesting)
 object.workflow_pipeline_initial_contact? #=> true (full nesting)
 
 PipelineEvent.with_pipeline_initial_contact #=> ActiveRecord::Relation
